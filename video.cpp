@@ -8,6 +8,7 @@
 int main( int argc, const char** argv )
 {
 	cv::VideoCapture cap;
+	cv::Mat frame, edges;
 	
 	if(argc > 1)
 	{
@@ -23,17 +24,14 @@ int main( int argc, const char** argv )
 		std::cerr << "Error: could not load a camera or video." << std::endl;
 	}
 	
-	cv::Mat frame, edges;
-	cv::namedWindow("video", 1);
+	// Create window
+	cv::namedWindow("Video", 1);
 	
 	for(;;)
 	{
 		cv::waitKey(20);
 		
 		cap >> frame;
-
-		cv::cvtColor(frame, edges, CV_BGR2GRAY);
-		cv::GaussianBlur(edges, edges, cv::Size(7,7), 1.5, 1.5);
 		
 		if(!frame.data)
 		{
@@ -41,6 +39,13 @@ int main( int argc, const char** argv )
 			break;
 		}
 
-		cv::imshow("video", edges);
+		// Convert frame to grey-scale
+		cv::cvtColor(frame, edges, CV_BGR2GRAY);
+
+		// Blur the frame
+		cv::GaussianBlur(edges, edges, cv::Size(3,3), 1.5, 1.5);
+
+		// Show current frame
+		cv::imshow("Video", edges);
 	}
 }
