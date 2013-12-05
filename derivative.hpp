@@ -10,9 +10,18 @@ class Derivative
 private:
 	cv::Mat ix, iy, it;
 
+	const int ddepth;
+
+	void computeX(cv::Mat frame, cv::Mat next);
+	void computeY(cv::Mat frame, cv::Mat next);
+	void computeT(cv::Mat frame, cv::Mat next);
+
 public:
 
-	void setDerivatives(cv::Mat frame);
+	Derivative();
+	~Derivative();
+
+	void setDerivatives(cv::Mat current_frame, cv::Mat next_frame);
 
 	cv::Mat getIx();
 	cv::Mat getIy();
