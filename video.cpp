@@ -6,6 +6,7 @@
 #include <cstdio>
 
 #include "derivative.hpp"
+#include "motion.hpp"
 
 int main( int argc, const char** argv )
 {
