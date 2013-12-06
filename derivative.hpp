@@ -12,20 +12,20 @@ private:
 
 	const int ddepth;
 
-	void computeX(cv::Mat frame, cv::Mat next);
-	void computeY(cv::Mat frame, cv::Mat next);
-	void computeT(cv::Mat frame, cv::Mat next);
+	void computeX(cv::Mat& frame, cv::Mat& next);
+	void computeY(cv::Mat& frame, cv::Mat& next);
+	void computeT(cv::Mat& frame, cv::Mat& next);
 
 public:
 
 	Derivative();
 	~Derivative();
 
-	void setDerivatives(cv::Mat current_frame, cv::Mat next_frame);
+	void setDerivatives(cv::Mat& current_frame, cv::Mat& next_frame);
 
-	cv::Mat getIx();
-	cv::Mat getIy();
-	cv::Mat getIt();
+	cv::Mat& getIx();
+	cv::Mat& getIy();
+	cv::Mat& getIt();
 };
 
 #endif

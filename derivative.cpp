@@ -4,7 +4,7 @@
 #include "derivative.hpp"
 
 
-Derivative::Derivative() : ddepth(CV_16S)
+Derivative::Derivative() : ddepth(CV_32F)
 {
 }
 
@@ -13,31 +13,32 @@ Derivative::~Derivative()
 }
 
 // Compute derivatives
-void Derivative::setDerivatives(cv::Mat current_frame, cv::Mat next_frame)
+void Derivative::setDerivatives(cv::Mat& current_frame, cv::Mat& next_frame)
 {
 	this->computeX(current_frame, next_frame);
 	this->computeY(current_frame, next_frame);
 	this->computeT(current_frame, next_frame);
 }
 
-cv::Mat Derivative::getIx()
+cv::Mat& Derivative::getIx()
 {
 	return this->ix;
 }
 	
-cv::Mat Derivative::getIy()
+cv::Mat& Derivative::getIy()
 {
 	return this->iy;
 }
 
-cv::Mat Derivative::getIt()
+cv::Mat& Derivative::getIt()
 {
 	return this->it;
 }
 
-void Derivative::computeX(cv::Mat frame, cv::Mat next)
+void Derivative::computeX(cv::Mat& frame, cv::Mat& next)
 {
 	cv::Mat x_grad, x_grad_next, x_abs, x_abs_next;
+	
 
 	cv::Sobel(frame, x_grad, this->ddepth, 1, 0); 
 	cv::Sobel(next, x_grad_next, this->ddepth, 1, 0);
@@ -45,10 +46,16 @@ void Derivative::computeX(cv::Mat frame, cv::Mat next)
 	cv::convertScaleAbs( x_grad, x_abs);
 	cv::convertScaleAbs( x_grad_next, x_abs_next );
 
-	cv::addWeighted(x_abs, 0.5, x_abs_next, 0.5, 0.0, this->ix);
+	cv::imshow("Wah", x_abs);
+	cv::waitKey();
+
+	cv::imshow("Wah2", x_abs_next);
+	cv::waitKey();
+
+ 	cv::addWeighted(x_abs, 0.5, x_abs_next, 0.5, 0.0, this->ix);
 }
 
-void Derivative::computeY(cv::Mat frame, cv::Mat next)
+void Derivative::computeY(cv::Mat& frame, cv::Mat& next)
 {
 	cv::Mat grad, grad_next, abs_frame, abs_next;
 
@@ -61,7 +68,7 @@ void Derivative::computeY(cv::Mat frame, cv::Mat next)
 	cv::addWeighted(abs_frame, 0.5, abs_next, 0.5, 0.0, this->iy);
 }
 
-void Derivative::computeT(cv::Mat frame, cv::Mat next)
+void Derivative::computeT(cv::Mat& frame, cv::Mat& next)
 {
 	cv::absdiff(frame, next, this->it);
 }

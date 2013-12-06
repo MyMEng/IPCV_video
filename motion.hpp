@@ -1,6 +1,56 @@
 #ifndef MOTION_H
 #define MOTION_H
 
+#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
+#include "derivative.hpp"
+
+// Forward declare classes
+class Motion;
+class LKTracker;
+
+// Typedefs for vectors
+
+typedef std::vector<Motion> MotionVector;
+
+// Tracks motion within one specified position
+class Motion 
+{
+private:
+
+	cv::Rect region;
+	cv::Mat extractedFrame, extractedNext;
+
+	// Hold reference to derivatives for all pixels in the region
+	Derivative *derivative;
+
+	void extractRegionAndUpdate(cv::Mat& frame, cv::Mat& next);
+public:
+	Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next);
+	~Motion();
+
+	void Update(cv::Mat& frame, cv::Mat& next);
+
+	cv::Mat getIx() { return this->derivative->getIx(); }
+	cv::Mat getIy() { return this->derivative->getIy(); }
+	cv::Mat getIt() { return this->derivative->getIt(); }
+
+};
+
+// Tracker for given positions
+class LKTracker
+{
+private:
+	MotionVector regions;
+public:
+	LKTracker() { };
+	~LKTracker() { };
+
+	void AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next);
+	void Update(cv::Mat& frame, cv::Mat& next);
+	void ShowAll();
+};
 
 #endif

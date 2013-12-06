@@ -72,13 +72,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="derivative.cpp" />
+    <ClCompile Include="motion.cpp" />
     <ClCompile Include="video.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="derivative.hpp" />
+    <ClInclude Include="motion.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="Makefile" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

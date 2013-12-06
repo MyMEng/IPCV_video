@@ -12,7 +12,7 @@ int main( int argc, const char** argv )
 {
 	cv::VideoCapture cap;
 	cv::Mat prev, frame, grey_frame;
-	Derivative der;
+	LKTracker motionTracker;
 	
 	if(argc > 1)
 	{
@@ -34,9 +34,16 @@ int main( int argc, const char** argv )
 	cv::namedWindow("Yderivative", 3);
 	cv::namedWindow("Tderivative", 4);
 	
+
+	cv::waitKey(20);
+	cap >> frame;
+	cv::cvtColor(frame, prev, CV_BGR2GRAY);
+
 	cv::waitKey(20);
 	cap >> frame;
 	cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
+
+	motionTracker.AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame);
 
 	for(;;)
 	{
@@ -55,12 +62,14 @@ int main( int argc, const char** argv )
 		// Convert frame to grey-scale
 		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
 
-		der.setDerivatives(prev, grey_frame);
+		motionTracker.Update(prev, grey_frame);
+		//der.setDerivatives(prev, grey_frame);
 
 		// Show current frame
-		cv::imshow("Video", grey_frame);
-		cv::imshow("Xderivative", der.getIx());
-		cv::imshow("Yderivative", der.getIy());
-		cv::imshow("Tderivative", der.getIt());
+		motionTracker.ShowAll();
+		//cv::imshow("Video", grey_frame);
+		//cv::imshow("Xderivative", der.getIx());
+		//cv::imshow("Yderivative", der.getIy());
+		//cv::imshow("Tderivative", der.getIt());
 	}
 }
