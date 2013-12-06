@@ -15,3 +15,12 @@ video
 *.la
 *.a
 
+# Visual Studio stuff
+*.opensdf
+*.sdf
+*.suo
+*.filters
+*.user
+Debug/
+Release/
+
