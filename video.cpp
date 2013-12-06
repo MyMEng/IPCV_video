@@ -59,9 +59,16 @@ int main( int argc, const char** argv )
 		
 		if(!frame.data)
 		{
+			if(argc > 1)
+			{
+				cap.set(CV_CAP_PROP_POS_FRAMES, 0);
+				continue;
+			}
 			std::cerr << "Error: no frame data." << std::endl;
 			break;
 		}
+
+		imshow("Video", frame);
 		
 		// Convert frame to grey-scale
 		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);

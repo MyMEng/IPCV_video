@@ -34,7 +34,7 @@ void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& fram
 
 	int num_regions = regions.size();
 
-	std::ostringstream xStream, yStream, tStream;
+	std::stringstream xStream, yStream, tStream;
 	xStream << num_regions << " X derivative";
 	cv::namedWindow(xStream.str(), num_regions*10);
 
@@ -44,7 +44,14 @@ void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& fram
 	tStream << num_regions << " T derivative";
 	cv::namedWindow(tStream.str(), num_regions*10+2);
 	
-	this->regions.at(num_regions-1)->SetWindowNames(xStream.str(), yStream.str(), tStream.str());
+	Motion * motionRegion = this->regions.at(num_regions-1);
+
+	std::string x, y, t;
+	x = xStream.str();
+	y = yStream.str();
+	t = tStream.str();
+
+	motionRegion->SetWindowNames(x, y, t);
 }
 
 // Update with new frames

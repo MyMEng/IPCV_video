@@ -1,9 +1,9 @@
 CC=g++
-CFLAGS=-Wall -pedantic
-OLIBS=video.o derivative.o motion.o
+CFLAGS=-Wall
+OLIBS=derivative.o motion.o video.o
 
 all: $(OLIBS)
-	$(CC) $(OLIBS) $(O_LIBS) -o video
+	$(CC)  -o video  $(O_LIBS) $(OLIBS)
 
 video.o:
 	$(CC) -c $(CFLAGS) video.cpp
