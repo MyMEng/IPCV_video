@@ -3,13 +3,18 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "derivative.hpp"
 
-
-Derivative::Derivative() : ddepth(CV_32F)
+Derivative::Derivative(int rows, int cols) : ddepth(CV_16S)
 {
+	this->ix = cv::Mat(rows, cols, ddepth);
+	this->iy = cv::Mat(rows, cols, ddepth);
+	this->it = cv::Mat(rows, cols, ddepth);	
 }
 
 Derivative::~Derivative()
 {
+	this->ix.release();
+	this->iy.release();
+	this->it.release();
 }
 
 // Compute derivatives
@@ -39,18 +44,11 @@ void Derivative::computeX(cv::Mat& frame, cv::Mat& next)
 {
 	cv::Mat x_grad, x_grad_next, x_abs, x_abs_next;
 	
-
 	cv::Sobel(frame, x_grad, this->ddepth, 1, 0); 
 	cv::Sobel(next, x_grad_next, this->ddepth, 1, 0);
 
 	cv::convertScaleAbs( x_grad, x_abs);
 	cv::convertScaleAbs( x_grad_next, x_abs_next );
-
-	cv::imshow("Wah", x_abs);
-	cv::waitKey();
-
-	cv::imshow("Wah2", x_abs_next);
-	cv::waitKey();
 
  	cv::addWeighted(x_abs, 0.5, x_abs_next, 0.5, 0.0, this->ix);
 }

@@ -10,8 +10,13 @@
 
 int main( int argc, const char** argv )
 {
+	// Capture device
 	cv::VideoCapture cap;
+
+	// Frames
 	cv::Mat prev, frame, grey_frame;
+	
+	// Motion tracker
 	LKTracker motionTracker;
 	
 	if(argc > 1)
@@ -28,29 +33,28 @@ int main( int argc, const char** argv )
 		std::cerr << "Error: could not load a camera or video." << std::endl;
 	}
 	
-	// Create window
+	// Create windows
 	cv::namedWindow("Video", 1);
-	cv::namedWindow("Xderivative", 2);
-	cv::namedWindow("Yderivative", 3);
-	cv::namedWindow("Tderivative", 4);
-	
 
-	cv::waitKey(20);
-	cap >> frame;
-	cv::cvtColor(frame, prev, CV_BGR2GRAY);
+	// Get first two farmes
+	do
+	{
+		cv::waitKey(100);
+		cap >> frame;
+		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
+		prev = grey_frame.clone();
+	}
+	while(frame.cols == 0);
 
-	cv::waitKey(20);
-	cap >> frame;
-	cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
-
+	// Add region to tracker
 	motionTracker.AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame);
+	motionTracker.AddRegion(cv::Vec2i(150, 50), cv::Size(100, 100), prev, grey_frame);
 
 	for(;;)
 	{
-		
+		// Get new frame, remember previous		
 		cv::waitKey(20);
 		prev = grey_frame.clone();
-		
 		cap >> frame;
 		
 		if(!frame.data)
@@ -58,18 +62,14 @@ int main( int argc, const char** argv )
 			std::cerr << "Error: no frame data." << std::endl;
 			break;
 		}
-
+		
 		// Convert frame to grey-scale
 		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
 
+		// Update region
 		motionTracker.Update(prev, grey_frame);
-		//der.setDerivatives(prev, grey_frame);
-
+		
 		// Show current frame
 		motionTracker.ShowAll();
-		//cv::imshow("Video", grey_frame);
-		//cv::imshow("Xderivative", der.getIx());
-		//cv::imshow("Yderivative", der.getIy());
-		//cv::imshow("Tderivative", der.getIt());
 	}
 }

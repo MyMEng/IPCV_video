@@ -18,7 +18,7 @@ private:
 
 public:
 
-	Derivative();
+	Derivative(int rows, int cols);
 	~Derivative();
 
 	void setDerivatives(cv::Mat& current_frame, cv::Mat& next_frame);
