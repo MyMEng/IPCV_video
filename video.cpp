@@ -35,20 +35,26 @@ int main( int argc, const char** argv )
 	
 	// Create windows
 	cv::namedWindow("Video", 1);
+	double frame_rate = cap.get(CV_CAP_PROP_FPS);
+	double frame_msec = 1000 / frame_rate;
+
+	std::cerr << "Frame rate: " << frame_rate << " frame per sec: " << frame_msec << std::endl;
 
 	// Get first two farmes
 	do
 	{
 		cv::waitKey(100);
+	
 		cap >> frame;
+
 		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
 		prev = grey_frame.clone();
 	}
 	while(frame.cols == 0);
 
 	// Add region to tracker
-	motionTracker.AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame);
-	motionTracker.AddRegion(cv::Vec2i(150, 50), cv::Size(100, 100), prev, grey_frame);
+	motionTracker.AddRegion(cv::Vec2i(25, 25), cv::Size(70, 150), prev, grey_frame);
+	//motionTracker.AddRegion(cv::Vec2i(150, 50), cv::Size(100, 100), prev, grey_frame);
 
 	for(;;)
 	{
@@ -61,7 +67,10 @@ int main( int argc, const char** argv )
 		{
 			if(argc > 1)
 			{
-				cap.set(CV_CAP_PROP_POS_FRAMES, 0);
+				if (cap.set(CV_CAP_PROP_POS_FRAMES, 0) == false)
+				{
+					std::cerr << "Error: unable to rewind" << std::endl;
+				}
 				continue;
 			}
 			std::cerr << "Error: no frame data." << std::endl;

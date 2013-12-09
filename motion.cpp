@@ -3,6 +3,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <cassert>
+#include <iostream>
 
 #include "motion.hpp"
 
@@ -30,26 +31,24 @@ LKTracker::~LKTracker()
 // Add region to tracking
 void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next)
 {
-	this->regions.push_back(new Motion(position, regionSize, frame, next));
+	Motion * motionRegion = new Motion(position, regionSize, frame, next);
+	this->regions.push_back(motionRegion);
 
 	int num_regions = regions.size();
 
 	std::stringstream xStream, yStream, tStream;
 	xStream << num_regions << " X derivative";
-	cv::namedWindow(xStream.str(), num_regions*10);
-
 	yStream << num_regions << " Y derivative";
-	cv::namedWindow(yStream.str(), num_regions*10+1);
-
 	tStream << num_regions << " T derivative";
-	cv::namedWindow(tStream.str(), num_regions*10+2);
-	
-	Motion * motionRegion = this->regions.at(num_regions-1);
 
 	std::string x, y, t;
 	x = xStream.str();
 	y = yStream.str();
 	t = tStream.str();
+
+	cv::namedWindow(x, 2);
+	cv::namedWindow(y, 2);
+	cv::namedWindow(t, 2);
 
 	motionRegion->SetWindowNames(x, y, t);
 }
@@ -88,8 +87,18 @@ Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat&
 
 	// Check if this region is possible
 	assert(x >= 0 && y >= 0 && x < frame.cols && y < frame.rows);
-	assert(x + regionSize.width < frame.cols && y+regionSize.height < frame.rows);
 
+	// Make sure regions are not too big
+	if(x + regionSize.width >= frame.cols)
+	{
+		regionSize.width = frame.cols - x;
+	}
+
+	if(y+regionSize.height >= frame.rows)
+	{	
+		regionSize.height = frame.rows - y;
+	}
+	
 	// Create rectangle to extract region later
 	this->region = cv::Rect(x, y, regionSize.width, regionSize.height);
 
