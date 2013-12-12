@@ -128,7 +128,7 @@ void Derivative::computeVelocity()
 
 	for(int i = 0; i < this->ix.rows; ++i)
 	{
-		for (int j = 0; j < this->ix.cols; ++j)
+		for (int j = 0; j < this->ix.cols; ++j )
 		{
 			A = cv::Mat::zeros(2, 2, CV_64FC1);
 			b = cv::Mat::zeros(2, 1, CV_64FC1);
@@ -141,7 +141,7 @@ void Derivative::computeVelocity()
 			A.at<double>(0,0) = x * x;
 			A.at<double>(0,1) = x * y; 
 			A.at<double>(1,0) = x * y;
-			A.at<double>(1,1) = x * x;
+			A.at<double>(1,1) = y * y;
 
 			b.at<double>(0,0) = -t * x;
 			b.at<double>(1,0) = -t * y;
