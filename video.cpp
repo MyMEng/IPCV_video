@@ -48,6 +48,7 @@ int main( int argc, const char** argv )
 		cap >> frame;
 
 		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
+		grey_frame.convertTo(grey_frame, CV_8U);
 		prev = grey_frame.clone();
 	}
 	while(frame.cols == 0);
