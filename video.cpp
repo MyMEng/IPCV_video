@@ -35,16 +35,10 @@ int main( int argc, const char** argv )
 	
 	// Create windows
 	cv::namedWindow("Video", 1);
-	double frame_rate = cap.get(CV_CAP_PROP_FPS);
-	double frame_msec = 1000 / frame_rate;
-
-	std::cerr << "Frame rate: " << frame_rate << " frame per sec: " << frame_msec << std::endl;
 
 	// Get first two farmes
 	do
-	{
-		cv::waitKey(100);
-	
+	{	
 		cap >> frame;
 
 		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
@@ -53,8 +47,14 @@ int main( int argc, const char** argv )
 	}
 	while(frame.cols == 0);
 
+	double frame_rate = cap.get(CV_CAP_PROP_FPS);
+	double frame_msec = 1000 / frame_rate;
+
+	std::cerr << "Frame rate: " << frame_rate << " frame per sec: " << frame_msec << std::endl;
+
+
 	// Add region to tracker
-	motionTracker.AddRegion(cv::Vec2i(25, 25), cv::Size(70, 150), prev, grey_frame);
+	motionTracker.AddRegion(cv::Vec2i(0, 0), cv::Size(120, 120), prev, grey_frame);
 	//motionTracker.AddRegion(cv::Vec2i(150, 50), cv::Size(100, 100), prev, grey_frame);
 
 	for(;;)
@@ -88,5 +88,6 @@ int main( int argc, const char** argv )
 		
 		// Show current frame
 		motionTracker.ShowAll();
+		motionTracker.ShowMotion();
 	}
 }

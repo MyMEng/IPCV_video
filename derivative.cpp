@@ -11,6 +11,9 @@ Derivative::Derivative(int rows, int cols) : ddepth(CV_8U)
 	this->ix = cv::Mat(rows, cols, ddepth);
 	this->iy = cv::Mat(rows, cols, ddepth);
 	this->it = cv::Mat(rows, cols, ddepth);	
+	
+	this->vx = cv::Mat(rows, cols, CV_32S);	
+	this->vy = cv::Mat(rows, cols, CV_32S);	
 }
 
 Derivative::~Derivative()
@@ -41,6 +44,16 @@ cv::Mat& Derivative::getIy()
 cv::Mat& Derivative::getIt()
 {
 	return this->it;
+}
+
+cv::Mat& Derivative::getVx()
+{
+	return this->vx;
+}
+
+cv::Mat& Derivative::getVy()
+{
+	return this->vy;
 }
 
 void Derivative::computeX(cv::Mat& frame, cv::Mat& next)
@@ -101,4 +114,43 @@ void Derivative::computeT(cv::Mat& frame, cv::Mat& next)
 			this->it.at<unsigned char>(i, j) = static_cast<unsigned char>(diff);
  		}
  	}
+}
+
+void Derivative::computeVelocity()
+{
+	cv::Mat xs, ys, ts;
+
+	cv::Mat A, b, V, Vconverted;
+
+	this->ix.convertTo(xs, CV_64FC1);
+	this->iy.convertTo(ys, CV_64FC1);
+	this->it.convertTo(ts, CV_64FC1);
+
+	for(int i = 0; i < this->ix.rows; ++i)
+	{
+		for (int j = 0; j < this->ix.cols; ++j)
+		{
+			A = cv::Mat::zeros(2, 2, CV_64FC1);
+			b = cv::Mat::zeros(2, 1, CV_64FC1);
+			V = cv::Mat::zeros(2, 1, CV_64FC1);
+
+			double x = xs.at<double>(i, j);
+			double y = ys.at<double>(i, j);
+			double t = ts.at<double>(i, j);
+
+			A.at<double>(0,0) = x * x;
+			A.at<double>(0,1) = x * y; 
+			A.at<double>(1,0) = x * y;
+			A.at<double>(1,1) = x * x;
+
+			b.at<double>(0,0) = -t * x;
+			b.at<double>(1,0) = -t * y;
+
+			V = A.inv() * b;
+			V.convertTo(Vconverted, CV_32S);
+
+			this->vx.at<int>(i, j) = Vconverted.at<int>(0,0);
+			this->vy.at<int>(i, j) = Vconverted.at<int>(1,0);
+		}
+	}
 }

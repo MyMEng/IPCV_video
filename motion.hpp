@@ -40,6 +40,8 @@ public:
 	cv::Mat getIx() { return this->derivative->getIx(); }
 	cv::Mat getIy() { return this->derivative->getIy(); }
 	cv::Mat getIt() { return this->derivative->getIt(); }
+	cv::Mat getVx() { return this->derivative->getVx(); }
+	cv::Mat getVy() { return this->derivative->getVy(); }
 
 	// Get titles of windows to display motion region
 	std::string& getWindowTitleX();
@@ -61,6 +63,7 @@ public:
 	void AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next);
 	void Update(cv::Mat& frame, cv::Mat& next);
 	void ShowAll();
+	void ShowMotion();
 };
 
 #endif

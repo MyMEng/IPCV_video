@@ -49,6 +49,8 @@ void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& fram
 	cv::namedWindow(x, 2);
 	cv::namedWindow(y, 2);
 	cv::namedWindow(t, 2);
+	cv::namedWindow("Vx", 3);
+	cv::namedWindow("Vy", 4);
 
 	motionRegion->SetWindowNames(x, y, t);
 }
@@ -77,6 +79,18 @@ void LKTracker::ShowAll()
 		cv::imshow(motion->getWindowTitleX(), motion->getIx());
 		cv::imshow(motion->getWindowTitleY(), motion->getIy());
 		cv::imshow(motion->getWindowTitleT(), motion->getIt());
+	}
+}
+
+void LKTracker::ShowMotion()
+{
+	MotionVector::iterator iter;
+
+	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
+	{
+		Motion *motion = (*iter);
+		cv::imshow("Vx", motion->getVx());
+		cv::imshow("Vy", motion->getVy());
 	}
 }
 
@@ -118,6 +132,7 @@ Motion::~Motion()
 void Motion::Update(cv::Mat& frame, cv::Mat& next)
 {
 	this->extractRegionAndUpdate(frame, next);
+	this->derivative->computeVelocity();
 }
 
 void Motion::extractRegionAndUpdate(cv::Mat& frame, cv::Mat& next)

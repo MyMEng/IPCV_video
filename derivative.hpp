@@ -8,7 +8,7 @@
 class Derivative 
 {
 private:
-	cv::Mat ix, iy, it;
+	cv::Mat ix, iy, it, vx, vy;
 
 	const int ddepth;
 
@@ -22,10 +22,13 @@ public:
 	~Derivative();
 
 	void setDerivatives(cv::Mat& current_frame, cv::Mat& next_frame);
+	void computeVelocity();
 
 	cv::Mat& getIx();
 	cv::Mat& getIy();
 	cv::Mat& getIt();
+	cv::Mat& getVx();
+	cv::Mat& getVy();
 };
 
 #endif
