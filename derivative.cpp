@@ -8,12 +8,12 @@
 
 Derivative::Derivative(int rows, int cols) : ddepth(CV_64F)
 {
-	this->ix = cv::Mat(rows, cols, ddepth);
-	this->iy = cv::Mat(rows, cols, ddepth);
-	this->it = cv::Mat(rows, cols, ddepth);	
+	this->ix = cv::Mat::zeros(rows, cols, ddepth);
+	this->iy = cv::Mat::zeros(rows, cols, ddepth);
+	this->it = cv::Mat::zeros(rows, cols, ddepth);	
 	
-	this->vx = cv::Mat(rows, cols, CV_32S);	
-	this->vy = cv::Mat(rows, cols, CV_32S);	
+	this->vx = cv::Mat::zeros(rows, cols, ddepth);	
+	this->vy = cv::Mat::zeros(rows, cols, ddepth);	
 }
 
 Derivative::~Derivative()
@@ -102,31 +102,42 @@ void Derivative::computeVelocity()
 {
 	cv::Mat A, b, V, Vconverted;
 
-	for(int i = 0; i < this->ix.rows; i += 10)
+	int regionSize = 16;
+
+	for(int i = 0; i < this->ix.rows; i += regionSize)
 	{
-		for (int j = 0; j < this->ix.cols; j += 10)
+		for (int j = 1; j < this->ix.cols; j += regionSize)
 		{
+
 			A = cv::Mat::zeros(2, 2, CV_64FC1);
 			b = cv::Mat::zeros(2, 1, CV_64FC1);
 			V = cv::Mat::zeros(2, 1, CV_64FC1);
 
-			double x = ix.at<double>(i, j);
-			double y = iy.at<double>(i, j);
-			double t = it.at<double>(i, j);
+			// Sum over region
+			for(int k = 0; k < regionSize; ++k) 
+			{
+				for(int l = 0; l < regionSize; ++l) 
+				{
+					double x = ix.at<double>(i+k, j+l);
+					double y = iy.at<double>(i+k, j+l);
+					double t = it.at<double>(i+k, j+l);
 
-			A.at<double>(0,0) = x * x;
-			A.at<double>(0,1) = x * y; 
-			A.at<double>(1,0) = x * y;
-			A.at<double>(1,1) = y * y;
+					A.at<double>(0,0) += x * x;
+					A.at<double>(0,1) += x * y; 
+					A.at<double>(1,0) += x * y;
+					A.at<double>(1,1) += y * y;
 
-			b.at<double>(0,0) = -t * x;
-			b.at<double>(1,0) = -t * y;
-
+					b.at<double>(0,0) += -t * x;
+					b.at<double>(1,0) += -t * y;
+				}
+			}
+			//std::cout << " A " << A << " b " << b << std::endl;
 			V = A.inv() * b;
-			V.convertTo(Vconverted, CV_32S);
 
-			this->vx.at<int>(i, j) = Vconverted.at<int>(0,0);
-			this->vy.at<int>(i, j) = Vconverted.at<int>(1,0);
+			//std::cout << " A.inv() " << A.inv() << " V " << V << std::endl;
+
+			this->vx.at<double>(i, j) = 100*V.at<double>(0,0);
+			this->vy.at<double>(i, j) = 100*V.at<double>(1,0);
 		}
 	}
 }

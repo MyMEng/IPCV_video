@@ -91,10 +91,14 @@ void LKTracker::ShowMotion(cv::Mat& image)
 		{
 			for(int j = 0; j < motion->getVy().rows; j++)
 			{
-				int x_component = motion->getVx().at<int>(i,j);
-				int y_component = motion->getVy().at<int>(i,j);
+				double x_component = motion->getVx().at<double>(i,j);
+				double y_component = motion->getVy().at<double>(i,j);
 
-				if(x_component == 0 && y_component == 0)
+				//std::cout << "vx " << x_component << " vy " << y_component << std::endl;
+
+				double magnitude_treshold = 10;
+
+				if(x_component < magnitude_treshold || y_component < magnitude_treshold)
 					continue;
 
 				cv::Point p1 = cv::Point(i, j);
