@@ -6,7 +6,7 @@
 
 #include "derivative.hpp"
 
-Derivative::Derivative(int rows, int cols) : ddepth(CV_8U)
+Derivative::Derivative(int rows, int cols) : ddepth(CV_64F)
 {
 	this->ix = cv::Mat(rows, cols, ddepth);
 	this->iy = cv::Mat(rows, cols, ddepth);
@@ -62,16 +62,10 @@ void Derivative::computeX(cv::Mat& frame, cv::Mat& next)
  	{
  		for (int j = 1; j < frame.cols-1; ++j)
  		{
- 			int first = static_cast<int>(frame.at<unsigned char>(i, j-1));
- 			int second = static_cast<int>(frame.at<unsigned char>(i, j+1));
- 			int diff = std::abs(second - first);
-
- 			// Truncate
- 			if(diff > 255) {
- 				diff = 255;
- 			}
-
-			this->ix.at<unsigned char>(i, j) = static_cast<unsigned char>(diff);
+ 			double first = frame.at<double>(i, j-1);
+ 			double second = frame.at<double>(i, j+1);
+ 			double diff = second - first;
+			this->ix.at<double>(i, j) = diff;
  		}
  	}
  }
@@ -82,16 +76,10 @@ void Derivative::computeY(cv::Mat& frame, cv::Mat& next)
  	{
  		for (int j = 0; j < frame.cols; ++j)
  		{
- 			int first = static_cast<int>(frame.at<unsigned char>(i-1, j));
- 			int second = static_cast<int>(frame.at<unsigned char>(i+1, j));
- 			int diff = std::abs(second - first);
-
- 			// Truncate
- 			if(diff > 255) {
- 				diff = 255;
- 			}
-
-			this->iy.at<unsigned char>(i, j) = static_cast<unsigned char>(diff);
+ 			double first = frame.at<double>(i-1, j);
+ 			double second = frame.at<double>(i+1, j);
+ 			double diff = second - first;
+			this->iy.at<double>(i, j) = diff;
  		}
  	}
 }
@@ -102,41 +90,29 @@ void Derivative::computeT(cv::Mat& frame, cv::Mat& next)
  	{
  		for (int j = 0; j < frame.cols; ++j)
  		{
- 			int first = static_cast<int>(frame.at<unsigned char>(i, j));
- 			int second = static_cast<int>(next.at<unsigned char>(i, j));
- 			int diff = std::abs(second - first);
-
- 			// Truncate
- 			if(diff > 255) {
- 				diff = 255;
- 			}
-
-			this->it.at<unsigned char>(i, j) = static_cast<unsigned char>(diff);
+ 			double first = frame.at<double>(i, j);
+ 			double second = next.at<double>(i, j);
+ 			double diff = second - first;
+			this->it.at<double>(i, j) = diff;
  		}
  	}
 }
 
 void Derivative::computeVelocity()
 {
-	cv::Mat xs, ys, ts;
-
 	cv::Mat A, b, V, Vconverted;
 
-	this->ix.convertTo(xs, CV_64FC1);
-	this->iy.convertTo(ys, CV_64FC1);
-	this->it.convertTo(ts, CV_64FC1);
-
-	for(int i = 0; i < this->ix.rows; ++i)
+	for(int i = 0; i < this->ix.rows; i += 10)
 	{
-		for (int j = 0; j < this->ix.cols; ++j )
+		for (int j = 0; j < this->ix.cols; j += 10)
 		{
 			A = cv::Mat::zeros(2, 2, CV_64FC1);
 			b = cv::Mat::zeros(2, 1, CV_64FC1);
 			V = cv::Mat::zeros(2, 1, CV_64FC1);
 
-			double x = xs.at<double>(i, j);
-			double y = ys.at<double>(i, j);
-			double t = ts.at<double>(i, j);
+			double x = ix.at<double>(i, j);
+			double y = iy.at<double>(i, j);
+			double t = it.at<double>(i, j);
 
 			A.at<double>(0,0) = x * x;
 			A.at<double>(0,1) = x * y; 

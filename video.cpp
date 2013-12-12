@@ -14,7 +14,7 @@ int main( int argc, const char** argv )
 	cv::VideoCapture cap;
 
 	// Frames
-	cv::Mat prev, frame, grey_frame;
+	cv::Mat prev, frame, grey_frame, show_frame;
 	
 	// Motion tracker
 	LKTracker motionTracker;
@@ -42,7 +42,7 @@ int main( int argc, const char** argv )
 		cap >> frame;
 
 		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
-		grey_frame.convertTo(grey_frame, CV_8U);
+		grey_frame.convertTo(grey_frame, CV_64F);
 		prev = grey_frame.clone();
 	}
 	while(frame.cols == 0);
@@ -78,16 +78,25 @@ int main( int argc, const char** argv )
 			break;
 		}
 
-		imshow("Video", frame);
 		
 		// Convert frame to grey-scale
 		cv::cvtColor(frame, grey_frame, CV_BGR2GRAY);
+		grey_frame.convertTo(grey_frame, CV_64F);
 
 		// Update region
 		motionTracker.Update(prev, grey_frame);
 		
 		// Show current frame
 		motionTracker.ShowAll();
-		motionTracker.ShowMotion();
+
+		show_frame = grey_frame.clone();
+
+		grey_frame.convertTo(show_frame, CV_8U);
+		
+		motionTracker.ShowMotion(show_frame);
+
+
+		
+		imshow("Video", show_frame);
 	}
 }

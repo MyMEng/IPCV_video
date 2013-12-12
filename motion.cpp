@@ -49,8 +49,6 @@ void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& fram
 	cv::namedWindow(x, 2);
 	cv::namedWindow(y, 2);
 	cv::namedWindow(t, 2);
-	cv::namedWindow("Vx", 3);
-	cv::namedWindow("Vy", 4);
 
 	motionRegion->SetWindowNames(x, y, t);
 }
@@ -82,15 +80,31 @@ void LKTracker::ShowAll()
 	}
 }
 
-void LKTracker::ShowMotion()
+void LKTracker::ShowMotion(cv::Mat& image)
 {
 	MotionVector::iterator iter;
 
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
 		Motion *motion = (*iter);
-		cv::imshow("Vx", motion->getVx());
-		cv::imshow("Vy", motion->getVy());
+		for(int i = 0; i < motion->getVx().rows; i++)
+		{
+			for(int j = 0; j < motion->getVy().rows; j++)
+			{
+				int x_component = motion->getVx().at<int>(i,j);
+				int y_component = motion->getVy().at<int>(i,j);
+
+				if(x_component == 0 && y_component == 0)
+					continue;
+
+				cv::Point p1 = cv::Point(i, j);
+				cv::Point p2 = cv::Point(x_component, y_component);
+
+				cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
+
+				std::cout << "P1 " << p1 << " P2 " << p2 << std::endl;
+			}
+		}
 	}
 }
 

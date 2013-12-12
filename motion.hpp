@@ -63,7 +63,7 @@ public:
 	void AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next);
 	void Update(cv::Mat& frame, cv::Mat& next);
 	void ShowAll();
-	void ShowMotion();
+	void ShowMotion(cv::Mat& image);
 };
 
 #endif
