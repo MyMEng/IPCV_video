@@ -24,8 +24,8 @@ Derivative::~Derivative()
 void Derivative::setDerivatives(cv::Mat& current_frame, cv::Mat& next_frame)
 {
 	this->computeX(current_frame, next_frame);
-	//this->computeY(current_frame, next_frame);
-	//this->computeT(current_frame, next_frame);
+	this->computeY(current_frame, next_frame);
+	this->computeT(current_frame, next_frame);
 }
 
 cv::Mat& Derivative::getIx()
@@ -45,44 +45,60 @@ cv::Mat& Derivative::getIt()
 
 void Derivative::computeX(cv::Mat& frame, cv::Mat& next)
 {
-	//cv::Mat x_grad, x_grad_next, x_abs, x_abs_next;
-	
-	/*cv::Sobel(frame, x_grad, this->ddepth, 1, 0); 
-	cv::Sobel(next, x_grad_next, this->ddepth, 1, 0);
-
-	cv::convertScaleAbs( x_grad, x_abs);
-	cv::convertScaleAbs( x_grad_next, x_abs_next );
-
- 	cv::addWeighted(x_abs, 0.5, x_abs_next, 0.5, 0.0, this->ix);*/
- 	
  	for(int i = 0; i < frame.rows; ++i)
  	{
- 		for (int j = 0; j < frame.cols; ++j)
+ 		for (int j = 1; j < frame.cols-1; ++j)
  		{
-			//int pixelLeft = frame.at<int>(i, j-1);
-			//int pixelRight = frame.at<int>(i, j+1);
-			//int nextL = next.at<int>(i, j-1);
-			//int nextR = next.at<int>(i, j + 1);
-			//int diff = (std::abs(pixelRight - pixelLeft) + std::abs(nextR - nextL) )/ 2;
-			this->ix.at<int>(i, j) = 128;
+ 			unsigned char first = frame.at<unsigned char>(i, j-1);
+ 			unsigned char second = frame.at<unsigned char>(i, j+1);
+ 			unsigned char diff = std::abs(second - first);
+
+ 			// Truncate
+ 			if(diff > 255) {
+ 				diff = 255;
+ 			}
+
+			this->ix.at<unsigned char>(i, j) = static_cast<unsigned char>(diff);
  		}
  	}
  }
 
 void Derivative::computeY(cv::Mat& frame, cv::Mat& next)
 {
-	cv::Mat grad, grad_next, abs_frame, abs_next;
+ 	for(int i = 1; i < frame.rows-1; ++i)
+ 	{
+ 		for (int j = 0; j < frame.cols; ++j)
+ 		{
+ 			unsigned char first = frame.at<unsigned char>(i-1, j);
+ 			unsigned char second = frame.at<unsigned char>(i+1, j);
+ 			unsigned char diff = std::abs(second - first);
 
-	cv::Sobel(frame, grad, this->ddepth, 0, 1); 
-	cv::Sobel(next, grad_next, this->ddepth, 0, 1);
+ 			// Truncate
+ 			if(diff > 255) {
+ 				diff = 255;
+ 			}
 
-	cv::convertScaleAbs( grad, abs_frame);
-	cv::convertScaleAbs( grad_next, abs_next );
-
-	cv::addWeighted(abs_frame, 0.5, abs_next, 0.5, 0.0, this->iy);
+			this->iy.at<unsigned char>(i, j) = static_cast<unsigned char>(diff);
+ 		}
+ 	}
 }
 
 void Derivative::computeT(cv::Mat& frame, cv::Mat& next)
 {
-	cv::absdiff(frame, next, this->it);
+	for(int i = 0; i < frame.rows; ++i)
+ 	{
+ 		for (int j = 0; j < frame.cols; ++j)
+ 		{
+ 			unsigned char first = frame.at<unsigned char>(i, j);
+ 			unsigned char second = next.at<unsigned char>(i, j);
+ 			unsigned char diff = std::abs(second - first);
+
+ 			// Truncate
+ 			if(diff > 255) {
+ 				diff = 255;
+ 			}
+
+			this->it.at<unsigned char>(i, j) = static_cast<unsigned char>(diff);
+ 		}
+ 	}
 }
