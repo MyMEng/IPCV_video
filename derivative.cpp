@@ -49,9 +49,9 @@ void Derivative::computeX(cv::Mat& frame, cv::Mat& next)
  	{
  		for (int j = 1; j < frame.cols-1; ++j)
  		{
- 			unsigned char first = frame.at<unsigned char>(i, j-1);
- 			unsigned char second = frame.at<unsigned char>(i, j+1);
- 			unsigned char diff = std::abs(second - first);
+ 			int first = static_cast<int>(frame.at<unsigned char>(i, j-1));
+ 			int second = static_cast<int>(frame.at<unsigned char>(i, j+1));
+ 			int diff = std::abs(second - first);
 
  			// Truncate
  			if(diff > 255) {
@@ -69,9 +69,9 @@ void Derivative::computeY(cv::Mat& frame, cv::Mat& next)
  	{
  		for (int j = 0; j < frame.cols; ++j)
  		{
- 			unsigned char first = frame.at<unsigned char>(i-1, j);
- 			unsigned char second = frame.at<unsigned char>(i+1, j);
- 			unsigned char diff = std::abs(second - first);
+ 			int first = static_cast<int>(frame.at<unsigned char>(i-1, j));
+ 			int second = static_cast<int>(frame.at<unsigned char>(i+1, j));
+ 			int diff = std::abs(second - first);
 
  			// Truncate
  			if(diff > 255) {
@@ -89,9 +89,9 @@ void Derivative::computeT(cv::Mat& frame, cv::Mat& next)
  	{
  		for (int j = 0; j < frame.cols; ++j)
  		{
- 			unsigned char first = frame.at<unsigned char>(i, j);
- 			unsigned char second = next.at<unsigned char>(i, j);
- 			unsigned char diff = std::abs(second - first);
+ 			int first = static_cast<int>(frame.at<unsigned char>(i, j));
+ 			int second = static_cast<int>(next.at<unsigned char>(i, j));
+ 			int diff = std::abs(second - first);
 
  			// Truncate
  			if(diff > 255) {
