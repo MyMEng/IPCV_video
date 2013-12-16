@@ -8,7 +8,8 @@
 #include "motion.hpp"
 
 // LKTracker constructor
-LKTracker::LKTracker()
+LKTracker::LKTracker() 
+	: magnitude_treshold(50.0)
 {
 }
 
@@ -105,14 +106,12 @@ void LKTracker::ShowMotion(cv::Mat& image)
 
 				//std::cout << "vx " << x_component << " vy " << y_component << std::endl;
 
-				double magnitude_treshold = 50;
-
 				cv::Point p1 = cv::Point(j, i);
 				cv::Point p2 = cv::Point(j+x_component, i+y_component);
 
 				// distance ?????
 				// if(cv::norm(px1-px2) < magnitude_treshold || cv::norm(py1-py2) < magnitude_treshold)
-				if(cv::norm(p1-p2) < magnitude_treshold)
+				if(cv::norm(p1-p2) < this->magnitude_treshold)
 					continue;
 
 				// Draw the vector
@@ -164,6 +163,8 @@ Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat&
 		regionSize.height = frame.rows - y;
 	}
 	
+	std::cout << "Created region from x: " << x << " y: " << y <<
+		" width: " << regionSize.width << " height: " << regionSize.height << std::endl;
 	// Create rectangle to extract region later
 	this->region = cv::Rect(x, y, regionSize.width, regionSize.height);
 

@@ -133,14 +133,33 @@ void Derivative::applyDerivative(cv::Mat& in, cv::Mat& out, cv::Mat& kernel)
 	}
 }
 
+void Derivative::averageTwoFrames(cv::Mat& out, cv::Mat& first, cv::Mat& second)
+{
+	for ( int i = 0; i < first.rows; i++ )
+	{	
+		for( int j = 0; j < first.cols; j++ )
+		{
+			double f = first.at<double>(i, j);
+			double s = second.at<double>(i, j);
+			out.at<double>(i, j) = (f+s)/2;
+		}
+	}
+}
+
 void Derivative::computeX(cv::Mat& frame, cv::Mat& next)
 {
-	Derivative::applyDerivative(frame, this->ix, this->xd);
+	cv::Mat thisFrame, nextFrame;
+	this->applyDerivative(frame, thisFrame, this->xd);
+	this->applyDerivative(next, nextFrame, this->xd);
+	this->averageTwoFrames(this->ix, thisFrame, nextFrame);
 }
 
 void Derivative::computeY(cv::Mat& frame, cv::Mat& next)
 {
- 	Derivative::applyDerivative(frame, this->iy, this->yd);
+	cv::Mat thisFrame, nextFrame;
+ 	this->applyDerivative(frame, thisFrame, this->yd);
+ 	this->applyDerivative(next, nextFrame, this->yd);
+ 	this->averageTwoFrames(this->iy, thisFrame, nextFrame);
 }
 
 void Derivative::computeT(cv::Mat& frame, cv::Mat& next)
@@ -165,9 +184,9 @@ void Derivative::computeVelocity()
 
 	int regionSize = 30;
 
-	for(int i = 0; i < this->ix.rows; i += regionSize)
+	for(int i = 0; i < this->ix.rows - regionSize; i += regionSize)
 	{
-		for (int j = 1; j < this->ix.cols; j += regionSize)
+		for (int j = 0; j < this->ix.cols - regionSize; j += regionSize)
 		{
 
 			A = cv::Mat::zeros(2, 2, CV_64FC1);

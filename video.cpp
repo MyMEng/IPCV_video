@@ -54,13 +54,13 @@ int main( int argc, const char** argv )
 
 
 	// Add region to tracker
-	motionTracker.AddRegion(cv::Vec2i(5, 5), cv::Size(205, 205), prev, grey_frame);
+	motionTracker.AddRegion(cv::Vec2i(5, 5), cv::Size(1000, 1000), prev, grey_frame);
 	// motionTracker.AddRegion(cv::Vec2i(300, 0), cv::Size(500, 100), prev, grey_frame);
 
 	for(;;)
 	{
 		// Get new frame, remember previous		
-		cv::waitKey(20);
+		cv::waitKey(30);
 		prev = grey_frame.clone();
 		cap >> frame;
 		

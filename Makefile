@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall
+CFLAGS=-Wall -O2
 OLIBS=derivative.o motion.o video.o
 
 all: $(OLIBS)

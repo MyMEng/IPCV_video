@@ -16,6 +16,7 @@ private:
 	void computeY(cv::Mat& frame, cv::Mat& next);
 	void computeT(cv::Mat& frame, cv::Mat& next);
 	void applyDerivative(cv::Mat& in, cv::Mat& out, cv::Mat& kernel);
+	void averageTwoFrames(cv::Mat& out, cv::Mat& first, cv::Mat& second);
 public:
 
 	Derivative(int rows, int cols);

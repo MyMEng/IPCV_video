@@ -56,6 +56,7 @@ class LKTracker
 {
 private:
 	MotionVector regions;
+	const double magnitude_treshold;
 public:
 	LKTracker();
 	~LKTracker();
