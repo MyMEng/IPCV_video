@@ -49,8 +49,6 @@ public:
 	std::string& getWindowTitleT();
 
 	void SetWindowNames(std::string& xWindowTitle, std::string& yWindowTitle, std::string& tWindowTitle);
-
-	void detectMotion(cv::Point A, cv::Point B);
 };
 
 // Tracker for given positions
@@ -66,6 +64,7 @@ public:
 	void Update(cv::Mat& frame, cv::Mat& next);
 	void ShowAll();
 	void ShowMotion(cv::Mat& image);
+	void detectMotion(cv::Point A, cv::Point B);
 };
 
 #endif

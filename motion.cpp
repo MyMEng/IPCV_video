@@ -98,7 +98,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 		Motion *motion = (*iter);
 		for(int i = 0; i < motion->getVx().rows; i++)
 		{
-			for(int j = 0; j < motion->getVy().rows; j++)
+			for(int j = 0; j < motion->getVx().cols; j++)
 			{
 				double x_component = motion->getVx().at<double>(i,j);
 				double y_component = motion->getVy().at<double>(i,j);
@@ -110,54 +110,24 @@ void LKTracker::ShowMotion(cv::Mat& image)
 				cv::Point p1 = cv::Point(j, i);
 				cv::Point p2 = cv::Point(j+x_component, i+y_component);
 
-				// cv::Point px1 = cv::Point(j, i);
-				// cv::Point px2 = cv::Point(j+x_component, i);
-
-				// cv::Point py1 = cv::Point(j, i);
-				// cv::Point py2 = cv::Point(j, i+y_component);
-
 				// distance ?????
 				// if(cv::norm(px1-px2) < magnitude_treshold || cv::norm(py1-py2) < magnitude_treshold)
 				if(cv::norm(p1-p2) < magnitude_treshold)
 					continue;
 
+				// Draw the vector
 				cv::circle ( image , p1 , 20 , cv::Scalar(0,255,0) , 2 , 8 );
 				cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
 				cv::circle ( image , p2 , 5 , cv::Scalar(0,255,0) , 2 , 8 );
 
-				// check whether the motion is big enough
-				// if (cv::norm(px1-px2) > 100)
-				// {
-							// cv::line(image, px1, px2, CV_RGB(255, 0, 0), 2);
-				// }
- 			// 	if (cv::norm(py1-py2) > 100)
-				// {
-							// cv::line(image, py1, py2, CV_RGB(255, 0, 0), 2);
-				// }
-
-				// std::cout << "P1 " << p1 << " P2 " << p2 << std::endl;
-				// Motion::detectMotion(p1, p2);
-					// disregard motion in Y
-	if (p1.y-p2.y < 50)
-	{
-
-		if (p1.x-p2.x > 50)
-		{
-			std::cout << "LEFT" << std::endl;
-		}
-
-		if (p1.x-p2.x < -50)
-		{
-			std::cout << "RIGHT" << std::endl;
-		}
-	}
-
+				// disregard motion in Y
+				detectMotion(p1, p2);
 			}
 		}
 	}
 }
 
-void Motion::detectMotion(cv::Point A, cv::Point B)
+void LKTracker::detectMotion(cv::Point A, cv::Point B)
 {
 	// disregard motion in Y
 	if (A.y-B.y < 50)
