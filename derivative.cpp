@@ -161,7 +161,9 @@ void Derivative::computeVelocity()
 {
 	cv::Mat A, b, V, Vconverted;
 
-	int regionSize = 16;
+	const double magnitudeScale = 30.0;
+
+	int regionSize = 30;
 
 	for(int i = 0; i < this->ix.rows; i += regionSize)
 	{
@@ -195,8 +197,8 @@ void Derivative::computeVelocity()
 
 			//std::cout << " A.inv() " << A.inv() << " V " << V << std::endl;
 
-			this->vx.at<double>(i, j) = 100*V.at<double>(0,0);
-			this->vy.at<double>(i, j) = 100*V.at<double>(1,0);
+			this->vx.at<double>(i, j) = magnitudeScale * V.at<double>(0,0);
+			this->vy.at<double>(i, j) = magnitudeScale * V.at<double>(1,0);
 		}
 	}
 }

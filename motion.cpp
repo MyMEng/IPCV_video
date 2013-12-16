@@ -105,22 +105,72 @@ void LKTracker::ShowMotion(cv::Mat& image)
 
 				//std::cout << "vx " << x_component << " vy " << y_component << std::endl;
 
-				double magnitude_treshold = 10;
+				double magnitude_treshold = 50;
 
-				if(x_component < magnitude_treshold || y_component < magnitude_treshold)
+				cv::Point p1 = cv::Point(j, i);
+				cv::Point p2 = cv::Point(j+x_component, i+y_component);
+
+				// cv::Point px1 = cv::Point(j, i);
+				// cv::Point px2 = cv::Point(j+x_component, i);
+
+				// cv::Point py1 = cv::Point(j, i);
+				// cv::Point py2 = cv::Point(j, i+y_component);
+
+				// distance ?????
+				// if(cv::norm(px1-px2) < magnitude_treshold || cv::norm(py1-py2) < magnitude_treshold)
+				if(cv::norm(p1-p2) < magnitude_treshold)
 					continue;
 
-				cv::Point p1 = cv::Point(i, j);
-				cv::Point p2 = cv::Point(x_component, y_component);
+				cv::circle ( image , p1 , 20 , cv::Scalar(0,255,0) , 2 , 8 );
+				cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
+				cv::circle ( image , p2 , 5 , cv::Scalar(0,255,0) , 2 , 8 );
 
 				// check whether the motion is big enough
-				if (cv::norm(p1-p2) > 150)
-				{
-					cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
-				}
+				// if (cv::norm(px1-px2) > 100)
+				// {
+							// cv::line(image, px1, px2, CV_RGB(255, 0, 0), 2);
+				// }
+ 			// 	if (cv::norm(py1-py2) > 100)
+				// {
+							// cv::line(image, py1, py2, CV_RGB(255, 0, 0), 2);
+				// }
 
-				std::cout << "P1 " << p1 << " P2 " << p2 << std::endl;
+				// std::cout << "P1 " << p1 << " P2 " << p2 << std::endl;
+				// Motion::detectMotion(p1, p2);
+					// disregard motion in Y
+	if (p1.y-p2.y < 50)
+	{
+
+		if (p1.x-p2.x > 50)
+		{
+			std::cout << "LEFT" << std::endl;
+		}
+
+		if (p1.x-p2.x < -50)
+		{
+			std::cout << "RIGHT" << std::endl;
+		}
+	}
+
 			}
+		}
+	}
+}
+
+void Motion::detectMotion(cv::Point A, cv::Point B)
+{
+	// disregard motion in Y
+	if (A.y-B.y < 50)
+	{
+
+		if (A.x-B.x > 20)
+		{
+			std::cout << "LEFT" << std::endl;
+		}
+
+		if (A.x-B.x < -20)
+		{
+			std::cout << "RIGHT" << std::endl;
 		}
 	}
 }
