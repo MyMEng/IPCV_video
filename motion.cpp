@@ -74,9 +74,18 @@ void LKTracker::ShowAll()
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
 		Motion *motion = (*iter);
-		cv::imshow(motion->getWindowTitleX(), motion->getIx());
-		cv::imshow(motion->getWindowTitleY(), motion->getIy());
-		cv::imshow(motion->getWindowTitleT(), motion->getIt());
+
+		cv::Mat a, b, c;
+		motion->getIx().convertTo(a, CV_8U);
+		motion->getIy().convertTo(b, CV_8U);
+		motion->getIt().convertTo(c, CV_8U);
+		cv::normalize(a, a, 0, 255, cv::NORM_MINMAX);
+		cv::normalize(b, b, 0, 255, cv::NORM_MINMAX);
+		cv::normalize(c, c, 0, 255, cv::NORM_MINMAX);
+
+		cv::imshow(motion->getWindowTitleX(), a);
+		cv::imshow(motion->getWindowTitleY(), b);
+		cv::imshow(motion->getWindowTitleT(), c);
 	}
 }
 
@@ -104,7 +113,11 @@ void LKTracker::ShowMotion(cv::Mat& image)
 				cv::Point p1 = cv::Point(i, j);
 				cv::Point p2 = cv::Point(x_component, y_component);
 
-				cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
+				// check whether the motion is big enough
+				if (cv::norm(p1-p2) > 150)
+				{
+					cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
+				}
 
 				std::cout << "P1 " << p1 << " P2 " << p2 << std::endl;
 			}

@@ -55,7 +55,7 @@ int main( int argc, const char** argv )
 
 	// Add region to tracker
 	motionTracker.AddRegion(cv::Vec2i(0, 0), cv::Size(120, 120), prev, grey_frame);
-	//motionTracker.AddRegion(cv::Vec2i(150, 50), cv::Size(100, 100), prev, grey_frame);
+	// motionTracker.AddRegion(cv::Vec2i(300, 0), cv::Size(500, 100), prev, grey_frame);
 
 	for(;;)
 	{
@@ -94,8 +94,6 @@ int main( int argc, const char** argv )
 		grey_frame.convertTo(show_frame, CV_8U);
 		
 		motionTracker.ShowMotion(show_frame);
-
-
 		
 		imshow("Video", show_frame);
 	}

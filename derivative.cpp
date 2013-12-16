@@ -13,7 +13,42 @@ Derivative::Derivative(int rows, int cols) : ddepth(CV_64F)
 	this->it = cv::Mat::zeros(rows, cols, ddepth);	
 	
 	this->vx = cv::Mat::zeros(rows, cols, ddepth);	
-	this->vy = cv::Mat::zeros(rows, cols, ddepth);	
+	this->vy = cv::Mat::zeros(rows, cols, ddepth);
+
+
+	const int kernelSize = 7;
+	const int xder[kernelSize][3] = {
+		{-1, 0, 1},
+		{-1, 0, 1},
+		{-1, 0, 1},
+		{-2, 0, 2},
+		{-1, 0, 1},
+		{-1, 0, 1},
+		{-1, 0, 1}
+	};
+	const int yder[3][kernelSize] = {
+		{-1, -1, -1, -2, -1, -1, -1},
+		{0,  0 , 0 , 0 , 0 , 0 , 0},
+		{1,  1 , 1 , 2 , 1 , 1 , 1}
+	};
+
+	this->xd = cv::Mat::zeros(kernelSize, kernelSize, ddepth);	
+	this->yd = cv::Mat::zeros(kernelSize, kernelSize, ddepth);
+
+	for (int i = 0; i < 3; ++i)
+	{
+		for (int j = 0; j < kernelSize; ++j)
+		{
+			this->yd.at<double>(i,j) = yder[i][j];
+		}
+	}
+	for (int i = 0; i < kernelSize; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			this->xd.at<double>(i,j) = xder[i][j];
+		}
+	}
 }
 
 Derivative::~Derivative()
@@ -56,32 +91,56 @@ cv::Mat& Derivative::getVy()
 	return this->vy;
 }
 
+void Derivative::applyDerivative(cv::Mat& in, cv::Mat& out, cv::Mat& kernel)
+{
+	// initialize the output using the input size
+	out.create(in.size(), CV_64F) ;
+
+	// create a padded version of the input to avoid border effects
+	int kernelRadiusX = ( kernel.size[0] - 1 ) / 2;
+	int kernelRadiusY = ( kernel.size[1] - 1 ) / 2;
+
+	cv::Mat paddedInput;
+	cv::copyMakeBorder( in, paddedInput, kernelRadiusX, kernelRadiusX,
+		kernelRadiusY, kernelRadiusY, cv::BORDER_REPLICATE );
+
+	// convolve
+	for ( int i = 0; i < in.rows; i++ )
+	{	
+		for( int j = 0; j < in.cols; j++ )
+		{
+			double sum = 0.0;
+			for( int m = -kernelRadiusX; m <= kernelRadiusX; m++ )
+			{
+				for( int n = -kernelRadiusY; n <= kernelRadiusY; n++ )
+				{
+					// find the correct indexes we are using
+					int imagex = i + kernelRadiusX + m;
+					int imagey = j + kernelRadiusY + n;
+					int kernelx = m + kernelRadiusX;
+					int kernely = n + kernelRadiusY;
+
+					// get the values from the padded image and the kernel
+					double imageval = paddedInput.at<double>( imagex, imagey );
+					double kernalval = kernel.at<double>( kernelx, kernely );
+
+					// do the multiplication
+					sum += imageval * kernalval;							
+				}
+			}
+			out.at<double>(i, j) = (double)sum;
+		}
+	}
+}
+
 void Derivative::computeX(cv::Mat& frame, cv::Mat& next)
 {
- 	for(int i = 0; i < frame.rows; ++i)
- 	{
- 		for (int j = 1; j < frame.cols-1; ++j)
- 		{
- 			double first = frame.at<double>(i, j-1);
- 			double second = frame.at<double>(i, j+1);
- 			double diff = second - first;
-			this->ix.at<double>(i, j) = diff;
- 		}
- 	}
- }
+	Derivative::applyDerivative(frame, this->ix, this->xd);
+}
 
 void Derivative::computeY(cv::Mat& frame, cv::Mat& next)
 {
- 	for(int i = 1; i < frame.rows-1; ++i)
- 	{
- 		for (int j = 0; j < frame.cols; ++j)
- 		{
- 			double first = frame.at<double>(i-1, j);
- 			double second = frame.at<double>(i+1, j);
- 			double diff = second - first;
-			this->iy.at<double>(i, j) = diff;
- 		}
- 	}
+ 	Derivative::applyDerivative(frame, this->iy, this->yd);
 }
 
 void Derivative::computeT(cv::Mat& frame, cv::Mat& next)

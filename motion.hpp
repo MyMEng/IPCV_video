@@ -23,7 +23,7 @@ private:
 	cv::Rect region;
 	cv::Mat extractedFrame, extractedNext;
 
-	// Title of windows to display riegion 
+	// Title of windows to display region 
 	std::string xWindowTitle, yWindowTitle, tWindowTitle;
 
 	// Hold reference to derivatives for all pixels in the region
