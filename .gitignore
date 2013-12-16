@@ -24,3 +24,5 @@ video
 Debug/
 Release/
 
+# Assignment description
+*.pdf
