@@ -47,9 +47,9 @@ void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& fram
 	y = yStream.str();
 	t = tStream.str();
 
-	cv::namedWindow(x, 2);
-	cv::namedWindow(y, 2);
-	cv::namedWindow(t, 2);
+	//cv::namedWindow(x, 2);
+	//cv::namedWindow(y, 2);
+	//cv::namedWindow(t, 2);
 
 	motionRegion->SetWindowNames(x, y, t);
 }
@@ -96,6 +96,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 
 	// TRUE- 1 is Right 	|	 FALSE- 0 is Left
 	int motionR, motionL, motionLast, motionLongestL, motionLongestR;
+	double motionSumL, motionSumR;
 
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
@@ -106,6 +107,12 @@ void LKTracker::ShowMotion(cv::Mat& image)
 		motionLast = 0;
 		motionLongestR = 0;
 		motionLongestL = 0;
+		motionSumL = 0;
+		motionSumR = 0;
+
+		cv::Rect origin = motion->getRect();
+
+		cv::rectangle(image, origin, CV_RGB(255, 0, 255), 2);
 
 		for(int i = 0; i < motion->getVx().rows; i++)
 		{
@@ -116,19 +123,34 @@ void LKTracker::ShowMotion(cv::Mat& image)
 
 				//std::cout << "vx " << x_component << " vy " << y_component << std::endl;
 
-				cv::Point p1 = cv::Point(j, i);
-				cv::Point p2 = cv::Point(j+x_component, i+y_component);
+				cv::Point p1 = cv::Point(j+origin.x, i+origin.y);
+				cv::Point p2 = cv::Point(j+x_component+origin.x, i + y_component+origin.y);
 
 				// distance ?????
 				// if(cv::norm(px1-px2) < magnitude_treshold || cv::norm(py1-py2) < magnitude_treshold)
-				if(cv::norm(p1-p2) < this->magnitude_treshold)
+				
+				if(cv::norm(p1-p2) >= magnitude_treshold)
+				{
+					// Draw the vector
+					cv::circle ( image , p1 , 4 , cv::Scalar(0,255,0) , 2 , 8 );
+					cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
+					cv::circle ( image , p2 , 1 , cv::Scalar(0,255,0) , 2 , 8 );
+				}
+
+				if(cv::norm(p1-p2) < 5)
+				{
 					continue;
+				}
 
-				// Draw the vector
-				cv::circle ( image , p1 , 20 , cv::Scalar(0,255,0) , 2 , 8 );
-				cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
-				cv::circle ( image , p2 , 5 , cv::Scalar(0,255,0) , 2 , 8 );
+				if(detectMotion(p1, p2) == 1) {
+					motionSumR += std::abs(x_component);
+					motionR++;
+				} else if(detectMotion(p1, p2) == 0) {
+					motionSumL += std::abs(x_component);
+					motionL++;
+				}
 
+				/*
 				// detect gestures
 				if(detectMotion(p1, p2) == 1 && motionLast == 1)
 				{
@@ -162,14 +184,28 @@ void LKTracker::ShowMotion(cv::Mat& image)
 						motionLongestR = motionR;
 					}
 				}
+				*/
+				
 			}
 		}
 
 		// print detected motion
-		if (motionLongestR>motionLongestL)
+		/*if (motionLongestR>motionLongestL)
 			std::cout << "RIGHT" << std::endl;
 		else if (motionLongestR<motionLongestL)
 			std::cout << "LEFT" << std::endl;
+
+			*/
+		double av_motion_l = motionSumL / motionL;
+		double av_motion_r = motionSumR / motionR;
+
+		cv::Point p(origin.x+50, origin.y+50);
+		if (av_motion_r>av_motion_l) {
+			cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
+		}
+		else if (av_motion_r<av_motion_l) {
+			cv::putText(image, "L", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
+		}
 	}
 }
 

@@ -54,13 +54,19 @@ int main( int argc, const char** argv )
 
 
 	// Add region to tracker
-	motionTracker.AddRegion(cv::Vec2i(0, 0), cv::Size(2000, 150), prev, grey_frame);
-	// motionTracker.AddRegion(cv::Vec2i(300, 0), cv::Size(500, 100), prev, grey_frame);
+
+	int x = frame.cols / 2;
+	int y = frame.rows / 2;
+	int xl = (int)(0.2*(double)frame.cols);
+	int yl = (int)(0.2*(double)frame.rows);
+
+	motionTracker.AddRegion(cv::Vec2i(x-xl, y-yl), cv::Size(x+xl, y+yl), prev, grey_frame);
+	motionTracker.AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame);
 
 	for(;;)
 	{
 		// Get new frame, remember previous		
-		cv::waitKey(30);
+		cv::waitKey(20);
 		prev = grey_frame.clone();
 		cap >> frame;
 		
@@ -68,7 +74,7 @@ int main( int argc, const char** argv )
 		{
 			if(argc > 1)
 			{
-				if (cap.set(CV_CAP_PROP_POS_FRAMES, 0) == false)
+				if (cap.set(CV_CAP_PROP_POS_FRAMES, 1) == false)
 				{
 					std::cerr << "Error: unable to rewind" << std::endl;
 				}
@@ -87,12 +93,12 @@ int main( int argc, const char** argv )
 		motionTracker.Update(prev, grey_frame);
 		
 		// Show current frame
-		motionTracker.ShowAll();
+		//motionTracker.ShowAll();
 
-		show_frame = grey_frame.clone();
+		show_frame = frame.clone();
 
-		grey_frame.convertTo(show_frame, CV_8U);
-		
+		show_frame.convertTo(show_frame, CV_8U);
+
 		motionTracker.ShowMotion(show_frame);
 		
 		imshow("Video", show_frame);

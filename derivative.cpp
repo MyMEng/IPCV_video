@@ -56,6 +56,10 @@ Derivative::~Derivative()
 	this->ix.release();
 	this->iy.release();
 	this->it.release();
+	this->xd.release();
+	this->yd.release();
+	this->vx.release();
+	this->vy.release();
 }
 
 // Compute derivatives

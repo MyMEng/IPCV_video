@@ -43,6 +43,8 @@ public:
 	cv::Mat getVx() { return this->derivative->getVx(); }
 	cv::Mat getVy() { return this->derivative->getVy(); }
 
+	cv::Rect getRect() { return this->region; }
+
 	// Get titles of windows to display motion region
 	std::string& getWindowTitleX();
 	std::string& getWindowTitleY();
