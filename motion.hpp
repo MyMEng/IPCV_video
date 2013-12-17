@@ -65,7 +65,7 @@ public:
 	void Update(cv::Mat& frame, cv::Mat& next);
 	void ShowAll();
 	void ShowMotion(cv::Mat& image);
-	void detectMotion(cv::Point A, cv::Point B);
+	int detectMotion(cv::Point A, cv::Point B);
 };
 
 #endif

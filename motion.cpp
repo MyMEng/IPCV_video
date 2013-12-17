@@ -94,9 +94,16 @@ void LKTracker::ShowMotion(cv::Mat& image)
 {
 	MotionVector::iterator iter;
 
+	// TRUE- 1 is Right 	|	 FALSE- 0 is Left
+	int motionR, motionL, motionLast;
+
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
 		Motion *motion = (*iter);
+		motionR = 0;
+		motionL = 0;
+		motionLast = 0;
+
 		for(int i = 0; i < motion->getVx().rows; i++)
 		{
 			for(int j = 0; j < motion->getVx().cols; j++)
@@ -119,29 +126,56 @@ void LKTracker::ShowMotion(cv::Mat& image)
 				cv::line(image, p1, p2, CV_RGB(255, 0, 0), 2);
 				cv::circle ( image , p2 , 5 , cv::Scalar(0,255,0) , 2 , 8 );
 
-				// disregard motion in Y
-				detectMotion(p1, p2);
+				// detect gestures
+				if(detectMotion(p1, p2) == 1 && motionLast == 1)
+				{
+					++motionR;
+					motionLast = 1;
+				}
+				else if(detectMotion(p1, p2) == 0 && motionLast == 0)
+				{
+					++motionL;
+					motionLast = 0;
+				}
 			}
 		}
+
+		// print detected motion
+		if (motionR>motionL)
+			std::cout << "RIGHT" << std::endl;
+		else if (motionR<motionL)
+			std::cout << "LEFT" << std::endl;
 	}
 }
 
-void LKTracker::detectMotion(cv::Point A, cv::Point B)
+int LKTracker::detectMotion(cv::Point A, cv::Point B)
 {
+
+	// check dominant motion; if it's in Y direction disregard
+	if(abs(B.y-A.y) > abs(B.x-A.x))
+		return -1;
+
+	//majority movement in a single sequence
+
+
 	// disregard motion in Y
-	if (A.y-B.y < 50)
+	if (A.y-B.y < 20)
 	{
 
-		if (A.x-B.x > 20)
+		if (A.x-B.x > 30)
 		{
-			std::cout << "LEFT" << std::endl;
+			// std::cout << "RIGHT" << std::endl;
+			return 1;
 		}
 
-		if (A.x-B.x < -20)
+		if (A.x-B.x < -30)
 		{
-			std::cout << "RIGHT" << std::endl;
+			// std::cout << "LEFT" << std::endl;
+			return 0;
 		}
 	}
+	else
+		return -1;
 }
 
 Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next)
