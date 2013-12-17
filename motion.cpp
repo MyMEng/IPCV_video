@@ -9,7 +9,7 @@
 
 // LKTracker constructor
 LKTracker::LKTracker() 
-	: magnitude_treshold(50.0)
+	: magnitude_treshold(30.0)
 {
 }
 
@@ -100,6 +100,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
 		Motion *motion = (*iter);
+
 		motionR = 0;
 		motionL = 0;
 		motionLast = 0;
@@ -165,9 +166,9 @@ void LKTracker::ShowMotion(cv::Mat& image)
 		}
 
 		// print detected motion
-		if (motionR>motionL)
+		if (motionLongestR>motionLongestL)
 			std::cout << "RIGHT" << std::endl;
-		else if (motionR<motionL)
+		else if (motionLongestR<motionLongestL)
 			std::cout << "LEFT" << std::endl;
 	}
 }
@@ -183,22 +184,22 @@ int LKTracker::detectMotion(cv::Point A, cv::Point B)
 
 
 	// disregard motion in Y
-	if (A.y-B.y < 20)
-	{
+	// if (abs(A.y-B.y) < 20)
+	// {
 
-		if (A.x-B.x > 30)
+		if (A.x-B.x > 5)
 		{
 			// std::cout << "RIGHT" << std::endl;
 			return 1;
 		}
 
-		if (A.x-B.x < -30)
+		if (A.x-B.x < -5)
 		{
 			// std::cout << "LEFT" << std::endl;
 			return 0;
 		}
-	}
-	
+	// }
+
 	return -1;
 }
 
