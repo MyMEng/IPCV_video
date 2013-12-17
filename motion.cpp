@@ -95,7 +95,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 	MotionVector::iterator iter;
 
 	// TRUE- 1 is Right 	|	 FALSE- 0 is Left
-	int motionR, motionL, motionLast;
+	int motionR, motionL, motionLast, motionLongestL, motionLongestR;
 
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
@@ -103,6 +103,8 @@ void LKTracker::ShowMotion(cv::Mat& image)
 		motionR = 0;
 		motionL = 0;
 		motionLast = 0;
+		motionLongestR = 0;
+		motionLongestL = 0;
 
 		for(int i = 0; i < motion->getVx().rows; i++)
 		{
@@ -132,10 +134,32 @@ void LKTracker::ShowMotion(cv::Mat& image)
 					++motionR;
 					motionLast = 1;
 				}
+				else if (detectMotion(p1, p2) == 1 && motionLast == 0)
+				{
+					motionR = 1;
+					motionLast = 1;
+
+					// check if last sequence of LEFTS- 0 was longest one
+					if (motionLongestL < motionL)
+					{
+						motionLongestL = motionL;
+					}
+				}
 				else if(detectMotion(p1, p2) == 0 && motionLast == 0)
 				{
 					++motionL;
 					motionLast = 0;
+				}
+				else if(detectMotion(p1, p2) == 0 && motionLast == 1)
+				{
+					motionL = 1;
+					motionLast = 0;
+
+					// check if last sequence of RIGHTS- 1 was longest one
+					if (motionLongestR < motionR)
+					{
+						motionLongestR = motionR;
+					}
 				}
 			}
 		}
@@ -174,8 +198,8 @@ int LKTracker::detectMotion(cv::Point A, cv::Point B)
 			return 0;
 		}
 	}
-	else
-		return -1;
+	
+	return -1;
 }
 
 Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next)
