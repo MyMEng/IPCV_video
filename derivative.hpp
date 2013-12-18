@@ -11,6 +11,7 @@ private:
 	cv::Mat ix, iy, it, vx, vy, xd, yd;
 
 	const int ddepth;
+	int regionSize;
 
 	void computeX(cv::Mat& frame, cv::Mat& next);
 	void computeY(cv::Mat& frame, cv::Mat& next);
@@ -19,7 +20,7 @@ private:
 	void averageTwoFrames(cv::Mat& out, cv::Mat& first, cv::Mat& second);
 public:
 
-	Derivative(int rows, int cols);
+	Derivative(int rows, int cols, int regionSize);
 	~Derivative();
 
 	void setDerivatives(cv::Mat& current_frame, cv::Mat& next_frame);

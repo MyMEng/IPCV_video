@@ -6,7 +6,7 @@
 
 #include "derivative.hpp"
 
-Derivative::Derivative(int rows, int cols) : ddepth(CV_64F)
+Derivative::Derivative(int rows, int cols, int regionSize) : ddepth(CV_64F), regionSize(regionSize)
 {
 	this->ix = cv::Mat::zeros(rows, cols, ddepth);
 	this->iy = cv::Mat::zeros(rows, cols, ddepth);
@@ -186,8 +186,6 @@ void Derivative::computeVelocity()
 
 	const double magnitudeScale = 30.0;
 
-	int regionSize = 30;
-
 	for(int i = 0; i < this->ix.rows - regionSize; i += regionSize)
 	{
 		for (int j = 0; j < this->ix.cols - regionSize; j += regionSize)
@@ -220,8 +218,8 @@ void Derivative::computeVelocity()
 
 			//std::cout << " A.inv() " << A.inv() << " V " << V << std::endl;
 
-			this->vx.at<double>(i, j) = magnitudeScale * V.at<double>(0,0);
-			this->vy.at<double>(i, j) = magnitudeScale * V.at<double>(1,0);
+			this->vx.at<double>(i+regionSize/2, j+regionSize/2) = magnitudeScale * V.at<double>(0,0);
+			this->vy.at<double>(i+regionSize/2, j+regionSize/2) = magnitudeScale * V.at<double>(1,0);
 		}
 	}
 }

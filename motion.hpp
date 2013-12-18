@@ -31,7 +31,7 @@ private:
 
 	void extractRegionAndUpdate(cv::Mat& frame, cv::Mat& next);
 public:
-	Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next);
+	Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next, int windowSize);
 	~Motion();
 	
 	void Update(cv::Mat& frame, cv::Mat& next);
@@ -63,7 +63,7 @@ public:
 	LKTracker(int threshold);
 	~LKTracker();
 
-	void AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next);
+	void AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next, int windowSize);
 	void Update(cv::Mat& frame, cv::Mat& next);
 	void ShowAll();
 	void ShowMotion(cv::Mat& image);

@@ -31,9 +31,9 @@ LKTracker::~LKTracker()
 }
 
 // Add region to tracking
-void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next)
+void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next, int windowSize)
 {
-	Motion * motionRegion = new Motion(position, regionSize, frame, next);
+	Motion * motionRegion = new Motion(position, regionSize, frame, next, windowSize);
 	this->regions.push_back(motionRegion);
 
 	int num_regions = regions.size();
@@ -166,7 +166,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 	}
 }
 
-Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next)
+Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next, int windowSize)
 {
 	int x = position[0];
 	int y = position[1];
@@ -191,7 +191,7 @@ Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat&
 	this->region = cv::Rect(x, y, regionSize.width, regionSize.height);
 
 	// Initialize derivative
-	this->derivative = new Derivative(this->region.height, this->region.width);	
+	this->derivative = new Derivative(this->region.height, this->region.width, windowSize);	
 }
 
 Motion::~Motion()
