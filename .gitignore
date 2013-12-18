@@ -26,3 +26,9 @@ Release/
 
 # Assignment description
 *.pdf
+*.aux
+*.log
+
+# movies
+*.avi
+*.mov
