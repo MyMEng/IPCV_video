@@ -58,16 +58,15 @@ class LKTracker
 {
 private:
 	MotionVector regions;
-	const double magnitude_treshold;
+	double magnitude_treshold;
 public:
-	LKTracker();
+	LKTracker(int threshold);
 	~LKTracker();
 
 	void AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next);
 	void Update(cv::Mat& frame, cv::Mat& next);
 	void ShowAll();
 	void ShowMotion(cv::Mat& image);
-	int detectMotion(cv::Point A, cv::Point B);
 };
 
 #endif

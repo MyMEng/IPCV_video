@@ -17,11 +17,33 @@ int main( int argc, const char** argv )
 	cv::Mat prev, frame, grey_frame, show_frame;
 	
 	// Motion tracker
-	LKTracker motionTracker;
+	LKTracker * motionTracker = NULL;
+
+	// Parameter values (if any)
+	int threshold = 30;
+	std::string videoName; 
+
+	for(int i=1; i < argc; i++)
+	{	
+		size_t pos;
+		std::string argVal(argv[i]);
+
+		if((pos = argVal.find("--threshold=")) != std::string::npos) {
+
+			size_t next_eq = argVal.find_first_of("=", pos);
+			size_t next_space = argVal.find_first_of(" \n", next_eq);
+			next_eq++;
+			std::string thresholdValue = argVal.substr(next_eq, (next_space-1)-next_eq);
+			std::cout << "Threshold substr " << thresholdValue << std::endl;
+			threshold = atoi(thresholdValue.c_str());
+		} else {
+			videoName = std::string(argv[i]);
+		}
+	}
 	
-	if(argc > 1)
+	if(!videoName.empty())
 	{
-		cap.open(std::string(argv[1]));
+		cap.open(videoName);
 	}
 	else
 	{
@@ -60,13 +82,19 @@ int main( int argc, const char** argv )
 	int xl = (int)(0.2*(double)frame.cols);
 	int yl = (int)(0.2*(double)frame.rows);
 
-	motionTracker.AddRegion(cv::Vec2i(x-xl, y-yl), cv::Size(x+xl, y+yl), prev, grey_frame);
-	motionTracker.AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame);
 
-	for(;;)
+	motionTracker = new LKTracker(threshold);
+
+	motionTracker->AddRegion(cv::Vec2i(x-xl, y-yl), cv::Size(x+xl, y+yl), prev, grey_frame);
+	motionTracker->AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame);
+
+	int waitKeyVal = -1;
+	
+	while(waitKeyVal == -1)
 	{
 		// Get new frame, remember previous		
-		cv::waitKey(20);
+		waitKeyVal = cv::waitKey(20);
+
 		prev = grey_frame.clone();
 		cap >> frame;
 		
@@ -90,7 +118,7 @@ int main( int argc, const char** argv )
 		grey_frame.convertTo(grey_frame, CV_64F);
 
 		// Update region
-		motionTracker.Update(prev, grey_frame);
+		motionTracker->Update(prev, grey_frame);
 		
 		// Show current frame
 		//motionTracker.ShowAll();
@@ -99,8 +127,14 @@ int main( int argc, const char** argv )
 
 		show_frame.convertTo(show_frame, CV_8U);
 
-		motionTracker.ShowMotion(show_frame);
+		motionTracker->ShowMotion(show_frame);
 		
 		imshow("Video", show_frame);
+	}
+
+	if(motionTracker != NULL)
+	{
+		delete motionTracker;
+		motionTracker = NULL;
 	}
 }

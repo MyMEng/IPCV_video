@@ -8,9 +8,10 @@
 #include "motion.hpp"
 
 // LKTracker constructor
-LKTracker::LKTracker() 
-	: magnitude_treshold(30.0)
+LKTracker::LKTracker(int threshold) 
+	: magnitude_treshold(threshold)
 {
+	std::cout << "Using threshold " << threshold << std::endl;
 }
 
 LKTracker::~LKTracker()
@@ -94,8 +95,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 {
 	MotionVector::iterator iter;
 
-	// TRUE- 1 is Right 	|	 FALSE- 0 is Left
-	int motionR, motionL, motionLast, motionLongestL, motionLongestR;
+	int motionR;
 	double motionSumL, motionSumR;
 
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
@@ -103,11 +103,6 @@ void LKTracker::ShowMotion(cv::Mat& image)
 		Motion *motion = (*iter);
 
 		motionR = 0;
-		motionL = 0;
-		motionLast = 0;
-		motionLongestR = 0;
-		motionLongestL = 0;
-		motionSumL = 0;
 		motionSumR = 0;
 
 		cv::Rect origin = motion->getRect();
@@ -129,6 +124,9 @@ void LKTracker::ShowMotion(cv::Mat& image)
 				// distance ?????
 				// if(cv::norm(px1-px2) < magnitude_treshold || cv::norm(py1-py2) < magnitude_treshold)
 				
+				if(std::abs(y_component) > std::abs(x_component))
+					continue;
+
 				if(cv::norm(p1-p2) >= magnitude_treshold)
 				{
 					// Draw the vector
@@ -137,106 +135,35 @@ void LKTracker::ShowMotion(cv::Mat& image)
 					cv::circle ( image , p2 , 1 , cv::Scalar(0,255,0) , 2 , 8 );
 				}
 
-				if(cv::norm(p1-p2) < 5)
-				{
-					continue;
-				}
-
-				if(detectMotion(p1, p2) == 1) {
-					motionSumR += std::abs(x_component);
-					motionR++;
-				} else if(detectMotion(p1, p2) == 0) {
-					motionSumL += std::abs(x_component);
-					motionL++;
-				}
-
-				/*
-				// detect gestures
-				if(detectMotion(p1, p2) == 1 && motionLast == 1)
-				{
-					++motionR;
-					motionLast = 1;
-				}
-				else if (detectMotion(p1, p2) == 1 && motionLast == 0)
-				{
-					motionR = 1;
-					motionLast = 1;
-
-					// check if last sequence of LEFTS- 0 was longest one
-					if (motionLongestL < motionL)
-					{
-						motionLongestL = motionL;
-					}
-				}
-				else if(detectMotion(p1, p2) == 0 && motionLast == 0)
-				{
-					++motionL;
-					motionLast = 0;
-				}
-				else if(detectMotion(p1, p2) == 0 && motionLast == 1)
-				{
-					motionL = 1;
-					motionLast = 0;
-
-					// check if last sequence of RIGHTS- 1 was longest one
-					if (motionLongestR < motionR)
-					{
-						motionLongestR = motionR;
-					}
-				}
-				*/
-				
+				motionSumR += x_component;
+				motionR++;
 			}
 		}
 
-		// print detected motion
-		/*if (motionLongestR>motionLongestL)
-			std::cout << "RIGHT" << std::endl;
-		else if (motionLongestR<motionLongestL)
-			std::cout << "LEFT" << std::endl;
-
-			*/
-		double av_motion_l = motionSumL / motionL;
-		double av_motion_r = motionSumR / motionR;
+		double av_motion_r = motionSumR;
 
 		cv::Point p(origin.x+50, origin.y+50);
-		if (av_motion_r>av_motion_l) {
+		cv::Point p1(origin.x+50, origin.y+75);
+
+		std::string text;
+		std::ostringstream s;
+
+		if (av_motion_r > magnitude_treshold) {
 			cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
+
+			s << "(" << av_motion_r << ")";
+
+			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 1);
 		}
-		else if (av_motion_r<av_motion_l) {
+		else if (av_motion_r < -1.0 && std::abs(av_motion_r) >= magnitude_treshold) {
 			cv::putText(image, "L", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
+			
+			s << "(" << av_motion_r << ")";
+
+			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 1);
+
 		}
 	}
-}
-
-int LKTracker::detectMotion(cv::Point A, cv::Point B)
-{
-
-	// check dominant motion; if it's in Y direction disregard
-	if(abs(B.y-A.y) > abs(B.x-A.x))
-		return -1;
-
-	//majority movement in a single sequence
-
-
-	// disregard motion in Y
-	// if (abs(A.y-B.y) < 20)
-	// {
-
-		if (A.x-B.x > 5)
-		{
-			// std::cout << "RIGHT" << std::endl;
-			return 1;
-		}
-
-		if (A.x-B.x < -5)
-		{
-			// std::cout << "LEFT" << std::endl;
-			return 0;
-		}
-	// }
-
-	return -1;
 }
 
 Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next)
