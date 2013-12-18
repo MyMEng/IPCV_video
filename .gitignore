@@ -24,5 +24,10 @@ video
 Debug/
 Release/
 
-# Assignment description
+# Assignment description and LaTeX files
 *.pdf
+*.aux
+*.log
+
+# Mac OS X
+*.DS_Store
