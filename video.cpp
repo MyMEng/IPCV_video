@@ -34,7 +34,6 @@ int main( int argc, const char** argv )
 			size_t next_space = argVal.find_first_of(" \n", next_eq);
 			next_eq++;
 			std::string thresholdValue = argVal.substr(next_eq, (next_space-1)-next_eq);
-			std::cout << "Threshold substr " << thresholdValue << std::endl;
 			threshold = atoi(thresholdValue.c_str());
 		} else {
 			videoName = std::string(argv[i]);
@@ -89,14 +88,16 @@ int main( int argc, const char** argv )
 	motionTracker->AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame);
 
 	int waitKeyVal = -1;
-	
+
 	while(waitKeyVal == -1)
 	{
 		// Get new frame, remember previous		
-		waitKeyVal = cv::waitKey(20);
+		waitKeyVal = cv::waitKey(16);
 
 		prev = grey_frame.clone();
 		cap >> frame;
+
+		//cv::medianBlur(frame, frame, 3);
 		
 		if(!frame.data)
 		{

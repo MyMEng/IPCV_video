@@ -96,7 +96,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 	MotionVector::iterator iter;
 
 	int motionR;
-	double motionSumL, motionSumR;
+	double motionSumR;
 
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
