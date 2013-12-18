@@ -30,6 +30,9 @@ int main( int argc, const char** argv )
 	// Allow defining regions?
 	bool askForRegions = false;
 
+	// Display all unit vectors for motion?
+	bool showAllVectors = false;
+
 	int windowSize = 30;
 
 	// Scan parameters read
@@ -47,7 +50,10 @@ int main( int argc, const char** argv )
 			threshold = atoi(thresholdValue.c_str());
 		} else if((pos = argVal.find("--regions")) != std::string::npos) {
 			askForRegions = true;
-		} else if((pos = argVal.find("--regionSize=")) != std::string::npos) {
+		} else if((pos = argVal.find("--showall")) != std::string::npos) {
+			showAllVectors = true;
+			askForRegions = false;
+		}else if((pos = argVal.find("--regionSize=")) != std::string::npos) {
 
 			size_t next_eq = argVal.find_first_of("=", pos);
 			size_t next_space = argVal.find_first_of(" \n", next_eq);
@@ -115,10 +121,18 @@ int main( int argc, const char** argv )
 	motionTracker = new LKTracker(threshold);
 
 	if(!askForRegions) 
+	{	
+		if(showAllVectors) 
+		{
+			motionTracker->AddRegion(cv::Vec2i(0, 0), cv::Size(frame.cols, frame.rows), prev, grey_frame, windowSize);
+		} 
+		else
+		{
+			motionTracker->AddRegion(cv::Vec2i(x-xl, y-yl), cv::Size(x+xl, y+yl), prev, grey_frame, windowSize);
+			motionTracker->AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame, windowSize);
+		}
+	} else 
 	{
-		motionTracker->AddRegion(cv::Vec2i(x-xl, y-yl), cv::Size(x+xl, y+yl), prev, grey_frame, windowSize);
-		motionTracker->AddRegion(cv::Vec2i(0, 0), cv::Size(150, 150), prev, grey_frame, windowSize);
-	} else {
 
 		int region_no = 1;
 
@@ -150,7 +164,7 @@ int main( int argc, const char** argv )
 		prev = grey_frame.clone();
 		cap >> frame;
 
-		//cv::medianBlur(frame, frame, 3);
+		cv::medianBlur(frame, frame, 3);
 		
 		if(!frame.data)
 		{
@@ -181,7 +195,11 @@ int main( int argc, const char** argv )
 
 		show_frame.convertTo(show_frame, CV_8U);
 
-		motionTracker->ShowMotion(show_frame);
+		if(showAllVectors) {
+			motionTracker->ShowAllVectors(show_frame);	
+		} else {
+			motionTracker->ShowMotion(show_frame);
+		}
 		
 		imshow("Video", show_frame);
 	}

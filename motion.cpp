@@ -91,6 +91,84 @@ void LKTracker::ShowAll()
 	}
 }
 
+void LKTracker::ShowAllVectors(cv::Mat& image) 
+{
+		MotionVector::iterator iter;
+
+	int motionR;
+	double motionSumR;
+
+	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
+	{
+		Motion *motion = (*iter);
+
+		motionR = 0;
+		motionSumR = 0;
+
+		cv::Rect origin = motion->getRect();
+
+		cv::rectangle(image, origin, CV_RGB(255, 0, 255), 2);
+
+		for(int i = 0; i < motion->getVx().rows; i++)
+		{
+			for(int j = 0; j < motion->getVx().cols; j++)
+			{
+				double x_component = motion->getVx().at<double>(i,j);
+				double y_component = motion->getVy().at<double>(i,j);
+
+				if(x_component == 0.0 && y_component == 0.0)
+					continue;
+
+				cv::Point p1 = cv::Point(j+origin.x, i+origin.y);
+				cv::Point p2 = cv::Point(j+origin.x, i+origin.y);
+
+				if(std::abs(x_component) >= 10 && std::abs(x_component) > std::abs(y_component))
+				{
+					int x_sign = std::abs(x_component) / x_component;
+					int y_sign = std::abs(y_component) / y_component;
+
+					if(std::abs(x_component) > motion->getWindowSize()) 
+					{
+						x_component = (x_component > 0) ? motion->getWindowSize()/2 : -motion->getWindowSize()/2;
+					}
+					p2.x += x_component;
+
+					if(std::abs(y_component) > motion->getWindowSize()) 
+					{
+						y_component = (y_component > 0) ? motion->getWindowSize()/2 : -motion->getWindowSize()/2;
+					}
+					p2.y += y_component;
+
+
+					motionSumR += x_component;
+					motionR++;
+				}
+
+				cv::line(image, p1, p2, CV_RGB(0, 0, 255), 2);
+			}
+		}
+
+		double av_motion_r = motionSumR / motionR;
+		cv::Point p(origin.x+50, origin.y+50);
+		cv::Point p1(origin.x+50, origin.y+75);
+
+		std::string text;
+		std::ostringstream s;
+
+		if(av_motion_r == av_motion_r) 
+		{
+			if (av_motion_r > 0) {
+				cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 1);
+			}
+			else if (av_motion_r < 0)
+				cv::putText(image, "L", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 1);
+			}
+
+		s << "(" << av_motion_r << ")";
+		cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(0,255,0), 1);
+	}
+}
+
 void LKTracker::ShowMotion(cv::Mat& image)
 {
 	MotionVector::iterator iter;
@@ -135,6 +213,10 @@ void LKTracker::ShowMotion(cv::Mat& image)
 					cv::circle ( image , p2 , 1 , cv::Scalar(0,255,0) , 2 , 8 );
 				}
 
+
+				if(std::abs(x_component) < 4.0)
+					continue;
+
 				motionSumR += x_component;
 				motionR++;
 			}
@@ -166,7 +248,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 	}
 }
 
-Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next, int windowSize)
+Motion::Motion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next, int windowSize) : windowSize(windowSize)
 {
 	int x = position[0];
 	int y = position[1];

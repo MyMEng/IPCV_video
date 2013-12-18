@@ -23,6 +23,8 @@ private:
 	cv::Rect region;
 	cv::Mat extractedFrame, extractedNext;
 
+	int windowSize;
+
 	// Title of windows to display region 
 	std::string xWindowTitle, yWindowTitle, tWindowTitle;
 
@@ -42,6 +44,7 @@ public:
 	cv::Mat getIt() { return this->derivative->getIt(); }
 	cv::Mat getVx() { return this->derivative->getVx(); }
 	cv::Mat getVy() { return this->derivative->getVy(); }
+	int getWindowSize() { return this->windowSize; }
 
 	cv::Rect getRect() { return this->region; }
 
@@ -67,6 +70,7 @@ public:
 	void Update(cv::Mat& frame, cv::Mat& next);
 	void ShowAll();
 	void ShowMotion(cv::Mat& image);
+	void ShowAllVectors(cv::Mat& image);
 };
 
 #endif
