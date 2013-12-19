@@ -62,8 +62,9 @@ class LKTracker
 private:
 	MotionVector regions;
 	double magnitude_treshold;
+	bool showDerivs;
 public:
-	LKTracker(int threshold);
+	LKTracker(int threshold, bool showDerivs);
 	~LKTracker();
 
 	void AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& frame, cv::Mat& next, int windowSize);

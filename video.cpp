@@ -35,6 +35,9 @@ int main( int argc, const char** argv )
 
 	int windowSize = 30;
 
+	// Show derivatives
+	bool showDerivs = false;
+
 	// Scan parameters read
 	for(int i=1; i < argc; i++)
 	{	
@@ -53,6 +56,8 @@ int main( int argc, const char** argv )
 		} else if((pos = argVal.find("--showall")) != std::string::npos) {
 			showAllVectors = true;
 			askForRegions = false;
+		} else if((pos = argVal.find("--showderiv")) != std::string::npos) {
+			showDerivs = true;
 		}else if((pos = argVal.find("--regionSize=")) != std::string::npos) {
 
 			size_t next_eq = argVal.find_first_of("=", pos);
@@ -118,7 +123,7 @@ int main( int argc, const char** argv )
 		threshold = 5;
 	}
 
-	motionTracker = new LKTracker(threshold);
+	motionTracker = new LKTracker(threshold, showDerivs);
 
 	if(!askForRegions) 
 	{	
@@ -189,7 +194,9 @@ int main( int argc, const char** argv )
 		motionTracker->Update(prev, grey_frame);
 		
 		// Show current frame
-		//motionTracker.ShowAll();
+		if(showDerivs) {
+			motionTracker->ShowAll();
+		}
 
 		show_frame = frame.clone();
 

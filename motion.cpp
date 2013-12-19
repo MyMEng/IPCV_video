@@ -8,8 +8,8 @@
 #include "motion.hpp"
 
 // LKTracker constructor
-LKTracker::LKTracker(int threshold) 
-	: magnitude_treshold(threshold)
+LKTracker::LKTracker(int threshold, bool showDerivs) 
+	: magnitude_treshold(threshold), showDerivs(showDerivs)
 {
 	std::cout << "Using threshold " << threshold << std::endl;
 }
@@ -48,10 +48,13 @@ void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& fram
 	y = yStream.str();
 	t = tStream.str();
 
-	//cv::namedWindow(x, 2);
-	//cv::namedWindow(y, 2);
-	//cv::namedWindow(t, 2);
-
+	if(this->showDerivs) 
+	{
+		cv::namedWindow(x, 2);
+		cv::namedWindow(y, 2);
+		cv::namedWindow(t, 2);
+	}
+	
 	motionRegion->SetWindowNames(x, y, t);
 }
 
@@ -144,7 +147,7 @@ void LKTracker::ShowAllVectors(cv::Mat& image)
 					motionR++;
 				}
 
-				cv::line(image, p1, p2, CV_RGB(0, 0, 255), 2);
+				cv::line(image, p1, p2, CV_RGB(0, 0, 255), 1);
 			}
 		}
 
@@ -158,14 +161,14 @@ void LKTracker::ShowAllVectors(cv::Mat& image)
 		if(av_motion_r == av_motion_r) 
 		{
 			if (av_motion_r > 0) {
-				cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 1);
+				cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
 			}
 			else if (av_motion_r < 0)
-				cv::putText(image, "L", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 1);
+				cv::putText(image, "L", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
 			}
 
 		s << "(" << av_motion_r << ")";
-		cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(0,255,0), 1);
+		cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(0,255,0), 3);
 	}
 }
 
