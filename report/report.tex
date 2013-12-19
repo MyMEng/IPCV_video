@@ -4,7 +4,7 @@
 \usepackage{times} % times font
 \usepackage{mathptmx} % times font in maths
 % \usepackage{fullpage}
-\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage[top=0.7in, bottom=1in, left=0.7in, right=1in]{geometry}
 \usepackage{multirow} %in tables
 \usepackage{caption} % in tables
 \pagenumbering{gobble}
@@ -24,8 +24,8 @@
 
 	\begin{minipage}{ 0.45\textwidth }
 		\begin{flushleft}
-			Kacper \textbf{Sokol}--- \texttt{ks1591} --- 3GGK1\\
-			Maciej \textbf{Kumorek}--- \texttt{mk0934}--- 3G403\
+			Kacper \textbf{Sokol} --- \texttt{ks1591} --- 3GGK1\\
+			Maciej \textbf{Kumorek} --- \texttt{mk0934} --- 3G403\
 		\end{flushleft}
 	\end{minipage}
 	\begin{minipage}{ 0.45\textwidth }
@@ -40,23 +40,26 @@
 \section*{Introduction}
 Our goal in this assignment was to implement Lucas-Kanade (LK) based motion detection program. This approached is based on horizontal, vertical and time based derivatives of a sequence of images. It is simplistic solution for motion detection task with some restrictions but ease of implementation and overall performance seems reasonable arguments to use this approach.
 
-\section*{Implementation and approach}
-\lipsum[1]
+\section*{Implementation / approach}
+blah.\\
+
+To avoid fixing threshold values we performed regression and determined exponential function that binds image and motion features with appropriate parameters.
+
+Blah.
 
 \section*{Program features}
 We have implemented a few different features that can be turned on by specifying the following arguments for the program:
 \begin{itemize}
-\item \texttt{--threshold=\textit{\#}}--- overwrite implemented thresholding function with fixed value,
-\item \texttt{--regions}--- enables user defined regions for motion tracking,
-\item \texttt{--showall}--- this switch enables grid of motion tracking points with attached unit vectors showing movement direction,
-\item \texttt{--regionSize=\textit{\#}}--- defines the size of region for derivative calculation.
+\item \texttt{--threshold=\textit{\#}} --- overwrite implemented thresholding function with fixed value,
+\item \texttt{--regions} --- enables user to defined multiple motion tracking regions with specified starting point, width and height,
+\item \texttt{--showall} --- this switch enables grid of motion tracking points with attached unit vectors showing movement direction,
+\item \texttt{--regionSize=\textit{\#}} --- defines the size of region for derivative calculation.
 \end{itemize}
 
-\section*{Deliverables}
-\begin{itemize}
-\item Literature survey of currently used semi-supervised learning algorithms.
-\item Basic analysis of the algorithms.
-\item Applications of such algorithms.
-\end{itemize}
+\section*{Performance}
+The main issue that can be observed is motion of object that are barely distinct from background. It is caused by derivatives being similar in certain region due to homogeneous colors.\\
+Other observed flaw are issues while light conditions are not sufficient or shadow is casted in some manner on object of which we try to detect motion.\\
+
+Other than that, our implementation seems reliable and robust being able to detect motion with high accuracy while tested on both video files and web camera stream.
 
 \end{document}
