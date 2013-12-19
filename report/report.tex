@@ -9,19 +9,7 @@
 \usepackage{caption} % in tables
 \pagenumbering{gobble}
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
-
-% \usepackage[pdftex]{graphicx}
 \usepackage{lipsum}
-
-% \usepackage{amsmath}
-% \usepackage{hyperref}
-% \usepackage{graphicx}
-% \usepackage{subfigure}
-% \usepackage{indentfirst} % indent frst paragraph of section
-
-% \usepackage[usenames,dvipsnames]{color}
-
-% \newcommand{\ts}{\textsuperscript}
 
 \begin{document}
 
@@ -50,39 +38,25 @@
 \end{@twocolumnfalse}
 ] % \lipsum[1]~\\[0.4cm]
 \section*{Introduction}
-Our goal in this assignment was to implement Lucas-Kanade (LK) motion detection algorithm.
+Our goal in this assignment was to implement Lucas-Kanade (LK) based motion detection program. This approached is based on horizontal, vertical and time based derivatives of a sequence of images. It is simplistic solution for motion detection task with some restrictions but ease of implementation and overall performance seems reasonable arguments to use this approach.
 
-\section*{Aims and objectives}
-We would like to divide our project into two parts. Firstly, we will crate a summary that will be an introduction to semi-supervised learning. We are going to present drawbacks of supervised and unsupervised learning. Then we will focus on theory behind semi-supervised learning and review common paradigms.
+\section*{Implementation and approach}
+\lipsum[1]
 
-The second part will describe and present the results of an experiment that we will conduct with simple semi-supervised algorithms that we aim to build. To this end, we are going to use number of classifiers implemented in \texttt{WEKA} machine learning package to produce simple classification algorithms. Next step will be to find instances of unlabeled data that have been classified with the same label in all used classifiers. From this set we are aiming to choose a subset of most probable predictions i.e.\ the ones that are believed to have the correct class assigned.
-
-Finally, we will compare and evaluate the correctness of our classification method and a few of supervised learning algorithms under assumption of having all data points labeled with ground truth.
-
-% The aim of your project should be a broad statement of what you intend to achieve or the problem you intend to solve; objectives are derived from the broader aim and set the realistic targets to achieve during the project (try to make them SMART: Specific, Measurable, Realistic, Achievable and Timed).
-
-% lern different classifiers from labeled data
-% use n\% of instances that were correctly classified
+\section*{Program features}
+We have implemented a few different features that can be turned on by specifying the following arguments for the program:
+\begin{itemize}
+\item \texttt{--threshold=\textit{\#}}--- overwrite implemented thresholding function with fixed value,
+\item \texttt{--regions}--- enables user defined regions for motion tracking,
+\item \texttt{--showall}--- this switch enables grid of motion tracking points with attached unit vectors showing movement direction,
+\item \texttt{--regionSize=\textit{\#}}--- defines the size of region for derivative calculation.
+\end{itemize}
 
 \section*{Deliverables}
 \begin{itemize}
 \item Literature survey of currently used semi-supervised learning algorithms.
 \item Basic analysis of the algorithms.
 \item Applications of such algorithms.
-% \item
-\vspace{30pt}
-\item Construction of simple semi-supervised learning algorithm.
-\item Comparison of accuracy between supervised and semi-supervised learning methods.
-\item Discussion of results collected.
-\item \textbf{\{}Stretch goal\textbf{\}} Producing additional semi-supervised classifiers for comparison purposes.\
 \end{itemize}
-
-% Here you should describe the concrete things you are going to produce in your project in order to achieve your aims and objectives: a literature survey, a demonstrator implementation, an experimental evaluation, etc.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% You should submit a report (starting with the agreed synopsis) and any code or data that you used in the project. For a literature review, the expectation is that this is 15-20 pages in length (10-15 pages if you're working on your own).
-% Your project will primarily be marked on the extent to which your report demonstrates a solid understanding of the machine learning techniques involved, how they relate to what was taught in the lectures, and how skillfully you apply them in the context of your chosen project topic.
-
 
 \end{document}
