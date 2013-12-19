@@ -54,7 +54,7 @@ void LKTracker::AddRegion(cv::Vec2i position, cv::Size regionSize, cv::Mat& fram
 		cv::namedWindow(y, 2);
 		cv::namedWindow(t, 2);
 	}
-	
+
 	motionRegion->SetWindowNames(x, y, t);
 }
 
@@ -98,15 +98,17 @@ void LKTracker::ShowAllVectors(cv::Mat& image)
 {
 		MotionVector::iterator iter;
 
-	int motionR;
-	double motionSumR;
+	int motionR, motionT;
+	double motionSumR, motionSumT;
 
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
 		Motion *motion = (*iter);
 
 		motionR = 0;
+		motionT = 0;
 		motionSumR = 0;
+		motionSumT = 0;
 
 		cv::Rect origin = motion->getRect();
 
@@ -127,9 +129,6 @@ void LKTracker::ShowAllVectors(cv::Mat& image)
 
 				if(std::abs(x_component) >= 10 && std::abs(x_component) > std::abs(y_component))
 				{
-					int x_sign = std::abs(x_component) / x_component;
-					int y_sign = std::abs(y_component) / y_component;
-
 					if(std::abs(x_component) > motion->getWindowSize()) 
 					{
 						x_component = (x_component > 0) ? motion->getWindowSize()/2 : -motion->getWindowSize()/2;
@@ -147,11 +146,32 @@ void LKTracker::ShowAllVectors(cv::Mat& image)
 					motionR++;
 				}
 
+				if(std::abs(y_component) >= 10 && std::abs(y_component) > std::abs(x_component))
+				{
+					if(std::abs(x_component) > motion->getWindowSize()) 
+					{
+						x_component = (x_component > 0) ? motion->getWindowSize()/2 : -motion->getWindowSize()/2;
+					}
+					p2.x += x_component;
+
+					if(std::abs(y_component) > motion->getWindowSize()) 
+					{
+						y_component = (y_component > 0) ? motion->getWindowSize()/2 : -motion->getWindowSize()/2;
+					}
+					p2.y += y_component;
+
+
+					motionSumT += y_component;
+					motionT++;
+				}
+
 				cv::line(image, p1, p2, CV_RGB(0, 0, 255), 1);
 			}
 		}
 
-		double av_motion_r = motionSumR / motionR;
+		double av_motion_r = motionSumR / motionR,
+		av_motion_l = motionSumT / motionT;
+
 		cv::Point p(origin.x+50, origin.y+50);
 		cv::Point p1(origin.x+50, origin.y+75);
 
@@ -160,15 +180,37 @@ void LKTracker::ShowAllVectors(cv::Mat& image)
 
 		if(av_motion_r == av_motion_r) 
 		{
-			if (av_motion_r > 0) {
-				cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
-			}
-			else if (av_motion_r < 0)
+			if (av_motion_r > 0) 
+			{
 				cv::putText(image, "L", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
 			}
+			else if (av_motion_r < 0)
+			{
+				cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
+			}
 
-		s << "(" << av_motion_r << ")";
-		cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(0,255,0), 3);
+			s << "(" << av_motion_r << ")";
+			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(0,255,0), 2);
+		}
+
+		p.x+=100;
+		p1.x+=100;
+
+
+		if(av_motion_l == av_motion_l) 
+		{
+			if (av_motion_l > 0) 
+			{
+				cv::putText(image, "D", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
+			}
+			else if (av_motion_l < 0)
+			{
+				cv::putText(image, "U", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
+			}
+
+			s << "(" << av_motion_r << ")";
+			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(0,255,0), 2);
+		}
 	}
 }
 
@@ -234,14 +276,14 @@ void LKTracker::ShowMotion(cv::Mat& image)
 		std::ostringstream s;
 
 		if (av_motion_r > magnitude_treshold) {
-			cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
+			cv::putText(image, "L", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
 
 			s << "(" << av_motion_r << ")";
 
 			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 1);
 		}
 		else if (av_motion_r < -1.0 && std::abs(av_motion_r) >= magnitude_treshold) {
-			cv::putText(image, "L", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
+			cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
 			
 			s << "(" << av_motion_r << ")";
 

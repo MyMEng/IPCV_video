@@ -41,15 +41,16 @@
 Our goal in this assignment was to implement Lucas-Kanade (LK) based motion detection program. This approached is based on horizontal, vertical and time based derivatives of a sequence of images. It is simplistic solution for motion detection task with some restrictions but ease of implementation and overall performance seems reasonable arguments to use this approach.
 
 \section*{Implementation / approach}
-blah.\\
 
-To avoid fixing threshold values we performed regression and determined exponential function that binds image and motion features with appropriate parameters.\\
-
-Blah.
-
+Our motion estimation class LKTracker can track motion within a specified region. We implemented methods for estimation derivatives in x and y directions as well as in time that use information from two frames. We calcualte difference for four 
+surrounding pixels in each directions for every pixel in a tracked region. We also allow to specify a window size (or sub-region) for which we sum values of derivatives for all pixels
+in the region in order to estimate velocity vectors in x and y directions for that given window. We then use the vectors to detect motion in the regions and see if it is going to the left or right by summing all x components of the speed and thresholding them according to a value that can be set.
+To avoid fixing default threshold values we performed regression and determined exponential function that binds image and motion features with appropriate parameters.
+We could also easly detect motion up and down the image by analysing y compontent of velocity vectors in the same way as for left and right.\\
 \section*{Program features}
 We have implemented a few different features that can be turned on by specifying the following arguments for the program:
 \begin{itemize}
+\item \texttt{--showderiv=\textit{\#}} --- Display derivatives calculated for each tracked region.
 \item \texttt{--threshold=\textit{\#}} --- overwrite implemented thresholding function with fixed value,
 \item \texttt{--regions} --- enables user to defined multiple motion tracking regions with specified starting point, width and height,
 \item \texttt{--showall} --- this switch enables grid of motion tracking points with attached unit vectors showing movement direction,
