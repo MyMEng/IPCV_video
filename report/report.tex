@@ -42,15 +42,16 @@ Our goal in this assignment was to implement Lucas-Kanade (LK) based motion dete
 
 \section*{Implementation / approach}
 
-Our motion estimation class LKTracker can track motion within a specified region. We implemented methods for estimation derivatives in x and y directions as well as in time that use information from two frames. We calcualte difference for four 
+Our motion estimation class LKTracker can track motion within a specified region. We implemented methods for estimation derivatives in x and y directions as well as in time that use information from two frames. We calculate difference for four 
 surrounding pixels in each directions for every pixel in a tracked region. We also allow to specify a window size (or sub-region) for which we sum values of derivatives for all pixels
 in the region in order to estimate velocity vectors in x and y directions for that given window. We then use the vectors to detect motion in the regions and see if it is going to the left or right by summing all x components of the speed and thresholding them according to a value that can be set.
-To avoid fixing default threshold values we performed regression and determined exponential function that binds image and motion features with appropriate parameters.
-We could also easly detect motion up and down the image by analysing y compontent of velocity vectors in the same way as for left and right.\\
+To avoid fixing default threshold values we performed regression and determined exponential function that binds image and motion features with appropriate parameters. It allows our program to catch all motions happening in the video ranging from really slow ones up to very fast moving objects.\\
+We could also easily detect motion up and down the image by analyzing y component of velocity vectors in the same way as for left and right.
+
 \section*{Program features}
 We have implemented a few different features that can be turned on by specifying the following arguments for the program:
 \begin{itemize}
-\item \texttt{--showderiv=\textit{\#}} --- Display derivatives calculated for each tracked region.
+\item \texttt{--showderiv} --- Display derivatives calculated for each tracked region.
 \item \texttt{--threshold=\textit{\#}} --- overwrite implemented thresholding function with fixed value,
 \item \texttt{--regions} --- enables user to defined multiple motion tracking regions with specified starting point, width and height,
 \item \texttt{--showall} --- this switch enables grid of motion tracking points with attached unit vectors showing movement direction,
@@ -61,6 +62,7 @@ We have implemented a few different features that can be turned on by specifying
 The main issue that can be observed is motion of object that are barely distinct from background. It is caused by derivatives being similar in certain region due to homogeneous colors.\\
 Other observed flaw are issues while light conditions are not sufficient or shadow is casted in some manner on object of which we try to detect motion.\\
 
-Other than that, our implementation seems reliable and robust being able to detect motion with high accuracy while tested on both video files and web camera stream.
+Other than that, our implementation seems reliable and robust being able to detect motion with high accuracy while tested on both video files and web camera stream.\\
+One of the others improvements that could be implemented is tracking objects and not predefined regions. This would result in possible motion in different directions in very small regions. In our approach for each region only major motions are reported.
 
 \end{document}
