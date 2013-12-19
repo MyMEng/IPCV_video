@@ -218,15 +218,15 @@ void LKTracker::ShowMotion(cv::Mat& image)
 {
 	MotionVector::iterator iter;
 
-	int motionR;
-	double motionSumR;
+	int motionR, motionUpDown;
+	double motionSumR, motionUpDownSum;
 
 	for(iter = this->regions.begin(); iter != this->regions.end(); ++iter)
 	{
 		Motion *motion = (*iter);
 
-		motionR = 0;
-		motionSumR = 0;
+		motionR = motionUpDown= 0;
+		motionSumR = motionUpDownSum = 0;
 
 		cv::Rect origin = motion->getRect();
 
@@ -244,9 +244,12 @@ void LKTracker::ShowMotion(cv::Mat& image)
 				cv::Point p1 = cv::Point(j+origin.x, i+origin.y);
 				cv::Point p2 = cv::Point(j+x_component+origin.x, i + y_component+origin.y);
 
-				// distance ?????
-				// if(cv::norm(px1-px2) < magnitude_treshold || cv::norm(py1-py2) < magnitude_treshold)
-				
+				if(std::abs(y_component) >= 4.0) 
+				{
+					motionUpDownSum += y_component;
+					motionUpDown += 1;
+				}
+
 				if(std::abs(y_component) > std::abs(x_component))
 					continue;
 
@@ -259,6 +262,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 				}
 
 
+
 				if(std::abs(x_component) < 4.0)
 					continue;
 
@@ -268,6 +272,7 @@ void LKTracker::ShowMotion(cv::Mat& image)
 		}
 
 		double av_motion_r = motionSumR;
+		double av_motion_l = motionUpDownSum / motionUpDown;
 
 		cv::Point p(origin.x+50, origin.y+50);
 		cv::Point p1(origin.x+50, origin.y+75);
@@ -280,15 +285,38 @@ void LKTracker::ShowMotion(cv::Mat& image)
 
 			s << "(" << av_motion_r << ")";
 
-			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 1);
+			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(0,255,0), 1);
 		}
 		else if (av_motion_r < -1.0 && std::abs(av_motion_r) >= magnitude_treshold) {
 			cv::putText(image, "R", p, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 3);
 			
 			s << "(" << av_motion_r << ")";
 
-			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0,255,0), 1);
+			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(0,255,0), 1);
 
+		}
+
+
+		p.x+=120;
+		p1.x+=120;
+
+		if(av_motion_l == av_motion_l) 
+		{
+			if (av_motion_l > 5.0) 
+			{
+				cv::putText(image, "D", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
+			}
+			else if (av_motion_l < -5.0)
+			{
+				cv::putText(image, "U", p, cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,255,0), 3);
+			}
+			else
+			{
+				continue;
+			}
+
+			s << "(" << av_motion_r << ")";
+			cv::putText(image, s.str(), p1, cv::FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(0,255,0), 1);
 		}
 	}
 }
